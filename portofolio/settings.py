@@ -80,7 +80,7 @@ WHITENOISE_USE_FINDERS = True
 
 WSGI_APPLICATION = 'portofolio.wsgi.application'
 
-
+# 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
