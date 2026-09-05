@@ -1,17 +1,32 @@
-# PBP Personal Portfolio 
-Nama : Zayyan Ramadzaki Firdaus
+<p align="center">
+  <a href="https://opencode.ai">
+    <picture>
+      <img src="static/img/pyortofolio.png" alt="My portofolio logo xixi">
+    </picture>
+  </a>
+</p>
 
-NPM : 2506550955
+<p align="center" style="color: #c3e3d6"><b>My personal portofolio for PBP courses.</b></p>
+<p align="center">
+  <a href="https://www.python.org"><img alt="django" src="https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white" /></a>
+  <a href="https://www.djangoproject.com/"><img alt="Build status" src="https://img.shields.io/badge/Django-092E20?style=flat&logo=django&logoColor=white" /></a>
+  <a href="https://sqlite.org"><img alt="Build status" src="https://img.shields.io/badge/SQLite-003B57?style=flat&logo=sqlite&logoColor=white" /></a>
+</p>
 
-Kelas : PBP F
+<pre align="left">
+Nama    : Zayyan Ramadzaki Firdaus
+NPM     : 2506550955
+Kelas   : PBP F
+</pre>
 
 ## Deskripsi Project
 
-Website ini merupakan portofolio pribadi saya yang sedang dikembangkan guna memenuhi penilaian PBP Semester Gasal 2026/2027. Untuk saat ini, portofolio saya mengandung identitas pribadi, latar belakang pendidikan saya, sedikit trivia mengenai saya, dan kemampuan yang saya punya. Website ini dikembangkan menggunakan Django 6.0.
+Website ini merupakan portofolio pribadi saya yang sedang dikembangkan guna memenuhi penilaian PBP Semester Gasal 2026/2027. Portofolio saya mengandung identitas pribadi, latar belakang pendidikan saya, sedikit trivia mengenai saya, dan kemampuan yang saya punya.
 
 Saat ini, website yang saya kembangkan masih bersifat statis dan sederhana. Pembaharuan akan dilakukan secara berkala, *so, stay tuned!*.
 
-## Tech Stack
+**Tech stack:**
+
 ![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
 ![Django](https://img.shields.io/badge/Django-092E20?style=flat&logo=django&logoColor=white)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
