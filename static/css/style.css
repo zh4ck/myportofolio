@@ -12,6 +12,11 @@
     --line: #e3d9c9;
     --text-muted: #6b6459;
     --radius: 4px;
+
+    --space-1: clamp(0.5rem, 0.5rem + 0.4vw, 0.875rem);
+    --space-2: clamp(1rem, 0.875rem + 0.9vw, 2rem);
+    --space-3: clamp(1.5rem, 1.25rem + 1.75vw, 3.5rem);
+    --gutter:  clamp(1.25rem, 0.75rem + 3vw, 3.5rem);
 }
 
 body {
@@ -28,7 +33,7 @@ h1, .brand {
 .container {
     max-width: 960px;
     margin: 0 auto;
-    padding: 0 1.5rem;
+    padding: 0 var(--gutter);
 }
 
 .site-header {
@@ -39,7 +44,7 @@ h1, .brand {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.25rem 1.5rem;
+    padding: 1.25rem var(--gutter);
 }
 
 .brand {
@@ -51,7 +56,7 @@ h1, .brand {
 
 .site-header nav {
     display: flex;
-    gap: 2rem;
+    gap: var(--space-2);
 }
 
 .site-header nav a {
@@ -60,7 +65,7 @@ h1, .brand {
     font-size: 0.95rem;
 }
 
-.hero {
+.main {
     padding: 4.5rem 0 5rem;
 }
 
@@ -70,7 +75,7 @@ h1, .brand {
     grid-template-areas:
         "identity photo"
         "details  photo";
-    gap: 1.5rem 3rem;
+    gap: 1.5rem var(--space-3);
 }
 
 .hero-identity {
@@ -103,7 +108,7 @@ h1, .brand {
 
 .meta-list {
     display: flex;
-    gap: 2rem;
+    gap: var(--space-2);
     margin-bottom: 1.5rem;
 }
 
@@ -121,7 +126,7 @@ h1, .brand {
 
 .social-links {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--space-1);
     flex-wrap: wrap;
 }
 
@@ -192,4 +197,104 @@ h1, .brand {
     .social-links {
         justify-content: flex-start;
     }
+}
+
+/* buat skills */
+
+.center-div {
+    text-align: center;
+    align-items: center;
+}
+
+.skills-header {
+    grid-area: header;
+}
+
+.skills-grid {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 3rem;
+}
+
+.skill-items {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+        "label label"
+        "bar   icon";
+    align-items: center;
+    column-gap: var(--space-2);
+    row-gap: 0.5rem;
+}
+
+.skill-items p {
+    grid-area: label;
+    font-family: "Space Grotesk", -apple-system, sans-serif;
+    font-size: 1.5rem;
+}
+
+.skill-items .skill-bar {
+    grid-area: bar;
+}
+
+.skill-items .skill-icon {
+    grid-area: icon;
+    width: 3.5rem;
+    height: auto;
+    justify-self: end;
+}
+
+h1 {
+    font-size: clamp(3rem, 7vw, 5rem);
+    line-height: 0.95;
+}
+
+.skill-bar {
+    text-align: left;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: white;
+    background-color: red;
+    border-radius: 10px 20px 10px 20px;
+    position: relative;
+    filter: drop-shadow(-0.5rem 0.75rem 0 #000000);
+}
+
+.skill-bar span {
+    padding-left: 1rem;
+}
+
+.fe {
+    width: 75%;
+    background: linear-gradient(90deg,rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 35%, rgba(0, 212, 255, 1) 100%);
+}
+
+.be {
+    width: 45%;
+    background: linear-gradient(90deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%, rgba(237, 221, 83, 1) 100%);
+}
+
+.devops {
+    width: 45%;
+    background: linear-gradient(90deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%, rgba(237, 221, 83, 1) 100%);
+}
+
+.pg {
+    width: 100%;
+    background: linear-gradient(90deg,rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgba(252, 176, 69, 1) 100%);
+}
+
+.cg {
+    width: 100%;
+    background: linear-gradient(90deg,rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgba(252, 176, 69, 1) 100%);
+}
+
+.skill {
+    padding-bottom: 4rem;
+}
+
+.disabled {
+    color: gray;
+    opacity: 0.5;
+    cursor: not-allowed;
 }
