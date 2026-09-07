@@ -1,109 +1,185 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zayyan - Portfolio</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <title>Zayyan — Portfolio</title>
+    <meta name="description" content="Zayyan Ramadzaki Firdaus — Information Systems student at Universitas Indonesia.">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <header class="site-header">
-        <div class="container">
-            <a href="#profile" class="site-brand">Zay's Portofolio</a>
-            <nav class="site-nav" aria-label="Primary navigation">
-                <a href="#profile">Profile</a>
-                <a href="#skills">Skills</a>
-                <span class="site-nav__item site-nav__item--disabled" aria-disabled="true">Experience</span>
-                <span class="site-nav__item site-nav__item--disabled" aria-disabled="true">Education</span>
-                <span class="site-nav__item site-nav__item--disabled" aria-disabled="true">Projects</span>
-            </nav>
-        </div>
+
+    <a class="skip-link" href="#landing">Skip to content</a>
+
+    <header class="site-nav" aria-label="Primary navigation">
+        <nav class="site-nav__links">
+            <a href="#landing" class="is-active" data-nav="HOME">HOME</a>
+            <a href="#landing" data-nav="WORKS" aria-disabled="true" tabindex="-1">WORKS</a>
+            <a href="#about" data-nav="ABOUT">ABOUT</a>
+        </nav>
     </header>
 
-    <main class="portfolio-main">
-        <section class="profile-section" id="profile" aria-labelledby="profile-title">
-            <div class="container profile-layout">
-                <div class="profile-heading">
-                    <p class="hero-kicker">Information System &middot; Universitas Indonesia</p>
-                    <h1 id="profile-title">Zayyan Ramadzaki Firdaus</h1>
+    <main>
+
+        <section class="screen" id="landing" aria-label="Landing">
+            <div class="artboard landing">
+                <div class="screen__bg screen__bg--grid" aria-hidden="true"></div>
+
+                <div class="landing__collage" aria-hidden="true">
+                    <img src="{% static 'img/about/pict/1.png' %}" class="card" style="left:21.458%; top:43.164%; width:14.167%; height:13.281%;"></img>
+                    <img src="{% static 'img/about/pict/2.png' %}" class="card" style="left:24.097%; top:54.297%; width:14.167%; height:13.281%;"></img>
+                    <img src="{% static 'img/about/pict/3.png' %}" class="card" style="left:27.153%; top:33.496%; width:14.097%; height:13.281%;"></img>
+                    <img src="{% static 'img/about/pict/4.png' %}" class="card" style="left:35.139%; top:24.707%; width:14.097%; height:13.281%;"></img>
+                    <img src="{% static 'img/about/pict/5.png' %}" class="card" style="left:35.625%; top:59.668%; width:14.097%; height:13.281%;"></img>
+                    <img src="{% static 'img/about/pict/6.png' %}" class="card" style="left:47.014%; top:55.566%; width:14.097%; height:13.281%;"></img>
+                    <img src="{% static 'img/about/pict/7.png' %}" class="card" style="left:48.264%; top:20.215%; width:14.097%; height:13.281%;"></img>
+                    <img src="{% static 'img/about/pict/8.png' %}" class="card" style="left:57.500%; top:24.707%; width:14.097%; height:13.281%;"></img>
+                    <img src="{% static 'img/about/pict/9.png' %}" class="card" style="left:58.403%; top:47.656%; width:14.097%; height:13.281%;"></img>
+                    <img src="{% static 'img/about/pict/10.png' %}" class="card" style="left:63.681%; top:35.840%; width:14.167%; height:13.184%;"></img>
                 </div>
-                <div class="profile-photo">
-                    <div class="profile-photo__accent" aria-hidden="true"></div>
-                    <img class="profile-photo__image" src="{% static 'img/profile.png' %}" alt="Photo of Zayyan">
+
+                <div class="landing__glyph">
+                    <span class="landing__glyph--ghost" aria-hidden="true">Z</span>
+                    <span class="landing__glyph--face" aria-hidden="true">Z</span>
                 </div>
-                <div class="profile-details">
-                    <p class="bio">CS student at Universitas Indonesia that's hoping to escape this hell-hole as soon as possible, also work as a teaching assistant for DDP 1 courses. Often times tampering around with all the infrastructure that I can get access into, including but not limited to this very PWS - Pacil Web Services.</p>
-                    <dl class="meta-list">
-                        <div class="meta-list__item">
-                            <dt>NPM</dt>
-                            <dd>2506550955</dd>
+
+                <a class="screen-arrow" href="#nickname" aria-label="Scroll to the next section">
+                    <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M5 9l7 7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+            </div>
+        </section>
+
+        <section class="screen" id="nickname" aria-label="Nickname">
+            <div class="artboard nickname">
+                <div class="screen__bg screen__bg--grid" aria-hidden="true"></div>
+                <div class="nickname__orb" aria-hidden="true"></div>
+
+                <p class="nickname__kicker">you can call me</p>
+
+                <div class="nickname__marquee">
+                    <div class="marquee marquee--a" aria-label="Zayyan">
+                        <div class="marquee__track">
+                            <div class="marquee__group"><i class="w w--d">zayyan</i><i class="w w--b">Zayyan</i><i class="w w--d">zayyan</i><i class="w w--d">zayyan</i><i class="w w--b">Zayyan</i><i class="w w--d">zayyan</i><i class="w w--d">zayyan</i><i class="w w--b">Zayyan</i><i class="w w--d">zayyan</i><i class="w w--d">zayyan</i><i class="w w--b">Zayyan</i><i class="w w--d">zayyan</i></div>
+                            <div class="marquee__group" aria-hidden="true"><i class="w w--d">zayyan</i><i class="w w--b">Zayyan</i><i class="w w--d">zayyan</i><i class="w w--d">zayyan</i><i class="w w--b">Zayyan</i><i class="w w--d">zayyan</i><i class="w w--d">zayyan</i><i class="w w--b">Zayyan</i><i class="w w--d">zayyan</i><i class="w w--d">zayyan</i><i class="w w--b">Zayyan</i><i class="w w--d">zayyan</i></div>
                         </div>
-                        <div class="meta-list__item">
-                            <dt>Program</dt>
-                            <dd>S1 Sistem Informasi</dd>
+                    </div>
+                    <div class="marquee marquee--b" aria-label="ZH4CK">
+                        <div class="marquee__track">
+                            <div class="marquee__group"><i class="w w--d">ZH4CK</i><i class="w w--b">ZH4CK</i><i class="w w--d">ZH4CK</i><i class="w w--d">ZH4CK</i><i class="w w--b">ZH4CK</i><i class="w w--d">ZH4CK</i><i class="w w--d">ZH4CK</i><i class="w w--b">ZH4CK</i><i class="w w--d">ZH4CK</i><i class="w w--d">ZH4CK</i><i class="w w--b">ZH4CK</i><i class="w w--d">ZH4CK</i></div>
+                            <div class="marquee__group" aria-hidden="true"><i class="w w--d">ZH4CK</i><i class="w w--b">ZH4CK</i><i class="w w--d">ZH4CK</i><i class="w w--d">ZH4CK</i><i class="w w--b">ZH4CK</i><i class="w w--d">ZH4CK</i><i class="w w--d">ZH4CK</i><i class="w w--b">ZH4CK</i><i class="w w--d">ZH4CK</i><i class="w w--d">ZH4CK</i><i class="w w--b">ZH4CK</i><i class="w w--d">ZH4CK</i></div>
                         </div>
-                    </dl>
-                    <div class="social-links">
-                        <a href="https://github.com/zh4ck" class="social-link">GitHub</a>
-                        <a href="https://linkedin.com/zayyanramadzaki" class="social-link">LinkedIn</a>
-                        <a href="mailto:zayyan@sunflair.dev" class="social-link">Email</a>
+                    </div>
+                    <div class="marquee marquee--c" aria-label="ZHACXK">
+                        <div class="marquee__track">
+                            <div class="marquee__group"><i class="w w--d">ZHACXK</i><i class="w w--b">ZHACXK</i><i class="w w--d">ZHACXK</i><i class="w w--d">ZHACXK</i><i class="w w--b">ZHACXK</i><i class="w w--d">ZHACXK</i><i class="w w--d">ZHACXK</i><i class="w w--b">ZHACXK</i><i class="w w--d">ZHACXK</i><i class="w w--d">ZHACXK</i><i class="w w--b">ZHACXK</i><i class="w w--d">ZHACXK</i></div>
+                            <div class="marquee__group" aria-hidden="true"><i class="w w--d">ZHACXK</i><i class="w w--b">ZHACXK</i><i class="w w--d">ZHACXK</i><i class="w w--d">ZHACXK</i><i class="w w--b">ZHACXK</i><i class="w w--d">ZHACXK</i><i class="w w--d">ZHACXK</i><i class="w w--b">ZHACXK</i><i class="w w--d">ZHACXK</i><i class="w w--d">ZHACXK</i><i class="w w--b">ZHACXK</i><i class="w w--d">ZHACXK</i></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        <section class="skills-section" id="skills" aria-labelledby="skills-title">
-            <div class="container">
-                <h2 class="skills-heading" id="skills-title">My Skills</h2>
-                <ul class="skills-list">
-                    <li class="skill-item">
-                        <h3 class="skill-name">Front-end Development</h3>
-                        <div class="skill-level skill-level--intermediate" role="progressbar" aria-label="Front-end Development" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
-                            <span>Intermediate</span>
-                        </div>
-                        <img class="skill-icon" src="{% static 'icons/react.svg' %}" alt="React logo">
-                    </li>
-                    <li class="skill-item">
-                        <h3 class="skill-name">Back-end Development</h3>
-                        <div class="skill-level skill-level--beginner" role="progressbar" aria-label="Back-end Development" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100">
-                            <span>Beginner</span>
-                        </div>
-                        <img class="skill-icon" src="{% static 'icons/django.svg' %}" alt="Django logo">
-                    </li>
-                    <li class="skill-item">
-                        <h3 class="skill-name">DevOps</h3>
-                        <div class="skill-level skill-level--beginner" role="progressbar" aria-label="DevOps" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100">
-                            <span>Beginner</span>
-                        </div>
-                        <img class="skill-icon" src="{% static 'icons/docker.svg' %}" alt="Docker logo">
-                    </li>
-                    <li class="skill-item">
-                        <h3 class="skill-name">Photography</h3>
-                        <div class="skill-level skill-level--experienced" role="progressbar" aria-label="Photography" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                            <span>Experienced</span>
-                        </div>
-                        <img class="skill-icon" src="{% static 'icons/premiere.svg' %}" alt="Premiere Pro logo">
-                    </li>
-                    <li class="skill-item">
-                        <h3 class="skill-name">Color Grading</h3>
-                        <div class="skill-level skill-level--experienced" role="progressbar" aria-label="Color Grading" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                            <span>Experienced</span>
-                        </div>
-                        <img class="skill-icon" src="{% static 'icons/lightroom.svg' %}" alt="Lightroom logo">
-                    </li>
-                </ul>
-            </div>
-        </section>
-    </main>
 
-    <footer class="site-footer">
-        <div class="container">
-            <p>&copy; 2026 Zayyan. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
-        </div>
-    </footer>
+                <p class="nickname__aside">or whatever, lol</p>
+
+                <a class="screen-arrow" href="#about" aria-label="Scroll to the next section">
+                    <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M5 9l7 7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+            </div>
+        </section>
+
+        <section class="screen" id="about" aria-label="About me">
+            <div class="artboard about">
+                <div class="screen__bg screen__bg--grid" aria-hidden="true"></div>
+
+                <div class="about__bglayer" aria-hidden="true">
+                    <div class="chip chip--left">
+                        <img src="{% static 'img/about/pict/1.png' %}" alt=""><span>HTML</span>
+                    </div>
+                    <div class="chip chip--left">
+                        <img src="{% static 'img/about/bg/css.png' %}" alt=""><span>CSS</span>
+                    </div>
+                    <div class="chip chip--left">
+                        <img src="{% static 'img/about/bg/js.png' %}" alt=""><span>JS</span>
+                    </div>
+                    <div class="chip chip--left">
+                        <img src="{% static 'img/about/bg/react.png' %}" alt=""><span>React</span>
+                    </div>
+                    <div class="chip chip--left">
+                        <img src="{% static 'img/about/bg/vue.png' %}" alt=""><span>Vue</span>
+                    </div>
+                    <div class="chip chip--left">
+                        <img src="{% static 'img/about/bg/next.png' %}" alt=""><span>Next</span>
+                    </div>
+                    <div class="chip chip--left">
+                        <img src="{% static 'img/about/bg/nuxt.png' %}" alt=""><span>Nuxt</span>
+                    </div>
+                    <div class="chip chip--left">
+                        <img src="{% static 'img/about/bg/docker.png' %}" alt=""><span>Docker</span>
+                    </div>
+                    <div class="chip chip--right">
+                        <img src="{% static 'img/about/bg/python.png' %}" alt=""><span>Python</span>
+                    </div>
+                    <div class="chip chip--right">
+                        <img src="{% static 'img/about/bg/ts.png' %}" alt=""><span>TS</span>
+                    </div>
+                    <div class="chip chip--right">
+                        <img src="{% static 'img/about/bg/cpp.png' %}" alt=""><span>C++</span>
+                    </div>
+                    <div class="chip chip--right">
+                        <img src="{% static 'img/about/bg/c.png' %}" alt=""><span>C</span>
+                    </div>
+                    <div class="chip chip--right">
+                        <img src="{% static 'img/about/bg/java.png' %}" alt=""><span>Java</span>
+                    </div>
+                </div>
+
+                <h2 class="about__title">NICE TO MEET YOU</h2>
+
+                <figure class="about__polaroid">
+                    <div class="about__polaroid--frame">
+                        <img class="about__polaroid--shot" src="{% static 'img/profile.png' %}" alt="Portrait silhouette of Zayyan">
+                    </div>
+                </figure>
+
+                <div class="about__text">
+                    <p class="about__whoami">whoami</p>
+                    <p class="about__bio">Passionate learners, aiming to become a polymath. Very interested in tinkering electronical devices and bootlegs. I spent my days experimenting with new things and creating something to be use for.</p>
+                    <p class="about__bio">Sometimes I play guitars, capturing moments, staring into the abysmal void of the universe, and most of the time reflecting on the meaning of life itself. The other time I&rsquo;m probably chilling out, walking around the city.</p>
+                </div>
+
+                <ul class="about__socials">
+                    <li><a href="https://github.com/zh4ck" target="_blank" rel="noopener" aria-label="GitHub">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.7 1.25 3.35.96.1-.75.4-1.25.72-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.59.23 2.76.11 3.05.73.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.25 5.67.41.35.77 1.05.77 2.12 0 1.53-.01 2.76-.01 3.14 0 .3.2.66.8.55A11.52 11.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg>
+                    </a></li>
+                    <li><a href="https://linkedin.com/in/zayyanramadzaki" target="_blank" rel="noopener" aria-label="LinkedIn">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4.98 3.5A2.5 2.5 0 1 1 0 3.5a2.5 2.5 0 0 1 4.98 0ZM.5 8.5h4.5V24H.5V8.5Zm7.5 0h4.31v2.13h.06c.6-1.14 2.07-2.34 4.27-2.34 4.56 0 5.4 3 5.4 6.9V24h-4.5v-7.84c0-1.87-.03-4.28-2.6-4.28-2.6 0-3 2.04-3 4.14V24h-4.44V8.5Z"/></svg>
+                    </a></li>
+                    <li><a href="https://instagram.com/zhacxk" target="_blank" rel="noopener" aria-label="Instagram">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23a3.7 3.7 0 0 1-.9 1.38c-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07ZM12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.88 5.88 0 0 0-2.13 1.38A5.88 5.88 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.8.72 1.47 1.38 2.13a5.88 5.88 0 0 0 2.13 1.38c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.88 5.88 0 0 0 2.13-1.38 5.88 5.88 0 0 0 1.38-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.88 5.88 0 0 0-1.38-2.13A5.88 5.88 0 0 0 19.86.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0Zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32ZM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm7.85-10.4a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0Z"/></svg>
+                    </a></li>
+                    <li><a href="https://x.com/zh4ck" target="_blank" rel="noopener" aria-label="X (Twitter)">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.8-7.58-6.64 7.58H.47l8.6-9.83L0 1.15h7.59l5.24 6.93L18.9 1.15Zm-1.29 19.5h2.04L6.49 3.24H4.3L17.61 20.65Z"/></svg>
+                    </a></li>
+                </ul>
+
+                <div class="about__stacks" aria-label="Tools I use">
+                    <img src="{% static 'img/about/stacks/ps.png' %}" alt="Photoshop">
+                    <img src="{% static 'img/about/stacks/pr.png' %}" alt="Premiere Pro">
+                    <img src="{% static 'img/about/stacks/ae.png' %}" alt="After Effects">
+                    <img src="{% static 'img/about/stacks/ai.png' %}" alt="Illustrator">
+                    <img src="{% static 'img/about/stacks/lr.png' %}" alt="Lightroom">
+                    <img src="{% static 'img/about/stacks/figma.png' %}" alt="Figma">
+                    <img src="{% static 'img/about/stacks/davinci.png' %}" alt="DaVinci Resolve">
+                    <img src="{% static 'img/about/stacks/vscode.png' %}" alt="Xcode">
+                    <img src="{% static 'img/about/stacks/intellij.png' %}" alt="IntelliJ IDEA">
+                    <img src="{% static 'img/about/stacks/obsidian.png' %}" alt="Godot">
+                </div>
+
+                <a class="screen-arrow" href="#landing" aria-label="Back to top">
+                    <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M5 15l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+            </div>
+        </section>
+
+    </main>
 </body>
 </html>
