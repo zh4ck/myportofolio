@@ -2,7 +2,7 @@ html {
     font-size: calc(100vw / 14.4);
 }
 
-@font-face { font-family: 'SFPro';    src: url('../fonts/sf-pro.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'SF Pro Display';    src: url('https://fonts.cdnfonts.com/css/sf-pro-display') format('truetype'); font-display: swap; }
 @font-face { font-family: 'Bitcount'; src: url('../fonts/Bitcount-single.ttf') format('truetype'); font-display: swap; }
 @font-face { font-family: 'GCGatuzo'; src: url('../fonts/GCGatuzoDemo-Bold.ttf') format('truetype'); font-display: swap; }
 @font-face { font-family: 'GroovySouls'; src: url('../fonts/Groovy Souls Demo.ttf') format('truetype'); font-display: swap; }
@@ -14,12 +14,12 @@ html {
     --ink-ghost: rgba(255, 255, 255, 0.12);
     --line: rgba(255, 255, 255, 0.05);
 
-    --font-sans: 'SFPro', -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    --font-bit: 'Bitcount', 'SFPro', monospace;
-    --font-gatu: 'GCGatuzo', 'SFPro', sans-serif;
-    --font-groovy: 'GroovySouls', 'SFPro', sans-serif;
-    --font-oughter: 'Oughter', 'SFPro', sans-serif;
-    --font-upheaval: 'Upheaval', 'SFPro', sans-serif;
+    --font-sans: 'SF Pro Display', -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-bit: 'Bitcount', 'SF Pro Display', monospace;
+    --font-gatu: 'GCGatuzo', 'SF Pro Display', sans-serif;
+    --font-groovy: 'GroovySouls', 'SF Pro Display', sans-serif;
+    --font-oughter: 'Oughter', 'SF Pro Display', sans-serif;
+    --font-upheaval: 'Upheaval', 'SF Pro Display', sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
