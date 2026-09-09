@@ -1,0 +1,81 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experience - {{ name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <a class="skip-link" href="#experience">Skip to content</a>
+
+    <header class="site-nav" aria-label="Primary navigation">
+        <nav class="site-nav__links">
+            <a href="{% url 'main:show_main' %}" data-nav="HOME">HOME</a>
+            <a href="{% url 'main:show_experience' %}" class="is-active" data-nav="WORKS">EXP</a>
+            <a href="{% url 'main:show_main' %}#about" data-nav="ABOUT">ABOUT</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="screen experience-screen" id="experience" aria-label="Experience">
+            <div class="artboard experience-artboard">
+                <div class="screen__bg screen__bg--grid" aria-hidden="true"></div>
+                <div class="experience__orb" aria-hidden="true"></div>
+
+                <div class="experience__header">
+                    <p class="section-kicker">My **********, so far...</p>
+                    <h1 class="experience__title">EXPERIENCE</h1>
+                </div>
+
+                <div class="experience-container">
+                    <div class="experience-grid">
+                        {% for experience in experience_list %}
+                            <article class="experience-card">
+                                <div class="experience-card__glow" aria-hidden="true"></div>
+                                <div class="experience-card__header">
+                                    <span class="experience-category">
+                                        {{ experience.get_category_display }}
+                                    </span>
+                                    {% if experience.is_ongoing %}
+                                        <span class="experience-badge experience-badge--ongoing">
+                                            <span class="experience-status">Ongoing</span>
+                                        </span>
+                                    {% else %}
+                                        <span class="experience-badge experience-badge--completed">
+                                            <span class="experience-status">Finished</span>
+                                        </span>
+                                    {% endif %}
+                                </div>
+
+                                <h2 class="experience-card__heading">{{ experience.title }}</h2>
+                                
+                                <p class="experience-description">
+                                    {{ experience.description }}
+                                </p>
+                            </article>
+                        {% empty %}
+                            <div class="empty-state">
+                                <p class="empty-state__msg">Belum ada pengalaman yang ditambahkan.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <a class="screen-arrow" href="{% url 'main:show_main' %}" aria-label="Back to home">
+                    <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M5 15l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
+    </footer>
+</body>
+</html>

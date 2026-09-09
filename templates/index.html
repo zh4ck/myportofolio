@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ name }} — Portfolio</title>
-    <meta name="description" content="Zayyan Ramadzaki Firdaus — Information Systems student at Universitas Indonesia.">
+    <meta name="description" content="{{ full_name }} — Information Systems student at Universitas Indonesia.">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
@@ -14,8 +14,8 @@
 
     <header class="site-nav" aria-label="Primary navigation">
         <nav class="site-nav__links">
-            <a href="#landing" class="is-active" data-nav="HOME">HOME</a>
-            <a href="#landing" data-nav="WORKS" aria-disabled="true" tabindex="-1">WORKS</a>
+            <a href="{% url 'main:show_main' %}" class="is-active" data-nav="HOME">HOME</a>
+            <a href="{% url 'main:show_experience' %}" data-nav="WORKS">EXP</a>
             <a href="#about" data-nav="ABOUT">ABOUT</a>
         </nav>
     </header>
@@ -78,7 +78,7 @@
                     </div>
                 </div>
 
-                <p class="nickname__aside">or whatever, lol</p>
+                <p class="nickname__aside">npm.get({{ npm }})</p>
 
                 <a class="screen-arrow" href="#about" aria-label="Scroll to the next section">
                     <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M5 9l7 7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -136,14 +136,13 @@
 
                 <figure class="about__polaroid">
                     <div class="about__polaroid--frame">
-                        <img class="about__polaroid--shot" src="{% static 'img/profile.png' %}" alt="Portrait silhouette of Zayyan">
+                        <img class="about__polaroid--shot" src="{% static 'img/profile.png' %}" alt="Portrait silhouette of {{ name }}">
                     </div>
                 </figure>
 
                 <div class="about__text">
-                    <p class="about__whoami">whoami</p>
-                    <p class="about__bio">Passionate learners, aiming to become a polymath. Very interested in tinkering electronical devices and bootlegs. I spent my days experimenting with new things and creating something to be use for.</p>
-                    <p class="about__bio">Sometimes I play guitars, capturing moments, staring into the abysmal void of the universe, and most of the time reflecting on the meaning of life itself. The other time I&rsquo;m probably chilling out, walking around the city.</p>
+                    <p class="about__whoami">$ {{ name }}</p>
+                    <p class="about__bio">{{ bio }}</p>
                 </div>
 
                 <ul class="about__socials">
@@ -160,6 +159,7 @@
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.8-7.58-6.64 7.58H.47l8.6-9.83L0 1.15h7.59l5.24 6.93L18.9 1.15Zm-1.29 19.5h2.04L6.49 3.24H4.3L17.61 20.65Z"/></svg>
                     </a></li>
                 </ul>
+                <p class="about__resume" aria-label="Study Program">{{ study_program }}</p>
 
                 <div class="about__stacks" aria-label="Tools I use">
                     <img src="{% static 'img/about/stacks/ps.png' %}" alt="Photoshop">
@@ -179,7 +179,9 @@
                 </a>
             </div>
         </section>
-
     </main>
+    <footer>
+        <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
+    </footer>
 </body>
 </html>
