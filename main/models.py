@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.db.models.functions import Now
 
 class Experience(models.Model):
     EXPERIENCE_CHOICES = [
@@ -36,10 +37,10 @@ class Projects(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=255)
-    description = models.TextField()
+    name = models.CharField(max_length=255, default='')
+    description = models.TextField(default='')
     category = models.CharField(max_length=20, choices=PROJECT_TYPES, default='other')
-    date_start = models.DateTimeField(auto_now_add=True)
+    date_start = models.DateTimeField(db_default=Now())
     date_end = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
