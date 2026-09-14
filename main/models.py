@@ -24,3 +24,27 @@ class Experience(models.Model):
     @property
     def is_ongoing(self):
         return self.ended_at is None
+
+class Projects(models.Model):
+    PROJECT_TYPES = [
+        ('photography', 'Photography'),
+        ('web-development', 'Web Development'),
+        ('video-editing', 'Video Editing'),
+        ('motion-graphics', 'Motion Graphics'),
+        ('graphics-design', 'Graphics Design'),
+        ('others', 'Others'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    category = models.CharField(max_length=20, choices=PROJECT_TYPES, default='other')
+    date_start = models.DateTimeField(auto_now_add=True)
+    date_end = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def is_ongoing(self):
+        return self.date_end is None
