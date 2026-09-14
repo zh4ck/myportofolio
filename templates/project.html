@@ -44,7 +44,11 @@
 
                                     <div class="project-card__photo">
                                         {% if project.thumbnail %}
-                                            <img src="{{ project.thumbnail }}" alt="{{ project.name }}">
+                                            {% if project.thumbnail|slice:":4" == "http" %}
+                                                <img src="{{ project.thumbnail }}" alt="{{ project.name }}">
+                                            {% else %}
+                                                <img src="{% static project.thumbnail %}" alt="{{ project.name }}">
+                                            {% endif %}
                                         {% else %}
                                             <span class="project-card__photo-fallback" aria-hidden="true">{{ project.name|slice:":1" }}</span>
                                         {% endif %}
