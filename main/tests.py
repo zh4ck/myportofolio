@@ -1,8 +1,10 @@
+from datetime import timedelta
+
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from main.models import Experience
+from main.models import Experience, Projects
 
 
 class MainTest(TestCase):
@@ -39,7 +41,7 @@ class MainTest(TestCase):
         self.assertContains(response, self.experience.title)
         self.assertContains(response, self.experience.description)
         self.assertContains(response, "Part-Time")
-        self.assertContains(response, "Sedang berlangsung")
+        self.assertContains(response, "Ongoing")
         self.assertContains(response, f'href="{reverse("main:show_main")}"')
 
     def test_empty_experience_page(self):
@@ -54,5 +56,36 @@ class MainTest(TestCase):
         response = self.client.get(reverse("main:show_experience"))
 
         self.assertFalse(self.experience.is_ongoing)
-        self.assertContains(response, "Selesai")
-        self.assertNotContains(response, "Sedang berlangsung")
+        self.assertContains(response, "Finished")
+        self.assertNotContains(response, "Ongoing")
+
+# buat test project
+
+class ProjectTest(TestCase):
+    def setUp(self):
+        self.project = Projects.objects.create(
+            name="Portfolio Website",
+            description="My portofolio aku loh ya",
+            category="web-development",
+            date_start=timezone.now() - timedelta(days=30),
+        )
+
+    def test_project_url_is_accessible(self):
+        response = self.client.get(reverse("main:show_project"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "project.html")
+
+    def test_project_page_shows_data_when_exists(self):
+        response = self.client.get(reverse("main:show_project"))
+
+        self.assertContains(response, self.project.name)
+        self.assertContains(response, self.project.description)
+        self.assertContains(response, "Web Development")
+
+    def test_empty_project_page_shows_empty_state(self):
+        Projects.objects.all().delete()
+        response = self.client.get(reverse("main:show_project"))
+
+        self.assertContains(response, "Yang sabara ya boss")
+        self.assertNotContains(response, self.project.name)
