@@ -40,6 +40,7 @@ class Projects(models.Model):
     name = models.CharField(max_length=255, default='')
     description = models.TextField(default='')
     category = models.CharField(max_length=20, choices=PROJECT_TYPES, default='other')
+    thumbnail = models.URLField(blank=True, null=True)
     date_start = models.DateTimeField(db_default=Now())
     date_end = models.DateTimeField(blank=True, null=True)
 

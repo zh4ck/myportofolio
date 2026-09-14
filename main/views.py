@@ -27,6 +27,7 @@ def show_experience(request):
 
 def show_project(request):
     context = {
-        "project_list": Projects.objects.all(),
+        "name": "Zayyan",
+        "project_list": Projects.objects.all().order_by("-date_start"),
     }
     return render(request, "project.html", context)

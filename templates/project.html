@@ -1,0 +1,87 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project - {{ name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <a class="skip-link" href="#project">Skip to content</a>
+
+    <header class="site-nav" aria-label="Primary navigation">
+        <nav class="site-nav__links">
+            <a href="{% url 'main:show_main' %}" data-nav="HOME">HOME</a>
+            <a href="{% url 'main:show_experience' %}" data-nav="EXPERIENCE">EXP</a>
+            <a href="{% url 'main:show_project' %}" class="is-active" data-nav="PROJECT">PROJECT</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="screen project-screen" id="project" aria-label="Project">
+            <div class="artboard project-artboard">
+                <div class="screen__bg screen__bg--grid" aria-hidden="true"></div>
+                <div class="project__orb" aria-hidden="true"></div>
+
+                <div class="project__header">
+                    <p class="section-kicker">Things I've built, from newest to oldest</p>
+                    <h1 class="project__title">PROJECT</h1>
+                </div>
+
+                <div class="project-container">
+                    <div class="project-timeline">
+                        {% for project in project_list %}
+                            <article class="project-item">
+                                <span class="project-item__dot" aria-hidden="true"></span>
+
+                                <div class="project-card">
+                                    <div class="project-card__glow" aria-hidden="true"></div>
+
+                                    <div class="project-card__photo">
+                                        {% if project.thumbnail %}
+                                            <img src="{{ project.thumbnail }}" alt="{{ project.name }}">
+                                        {% else %}
+                                            <span class="project-card__photo-fallback" aria-hidden="true">{{ project.name|slice:":1" }}</span>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="project-card__body">
+                                        <div class="project-card__top">
+                                            <h2 class="project-card__name">{{ project.name }}</h2>
+                                            <span class="project-category">{{ project.get_category_display }}</span>
+                                        </div>
+
+                                        <p class="project-card__dates">
+                                            {{ project.date_start|date:"M Y" }} &ndash;
+                                            {% if project.is_ongoing %}Present{% else %}{{ project.date_end|date:"M Y" }}{% endif %}
+                                        </p>
+
+                                        <p class="project-card__description">{{ project.description }}</p>
+                                    </div>
+                                </div>
+                            </article>
+                        {% empty %}
+                            <div class="empty-state">
+                                <p class="empty-state__msg">Yang sabara ya boss</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <a class="screen-arrow" href="{% url 'main:show_main' %}" aria-label="Back to home">
+                    <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M5 15l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
+    </footer>
+</body>
+</html>
