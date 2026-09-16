@@ -1,27 +1,14 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+{% block meta %}
     <title>{{ name }} — Portfolio</title>
-    <meta name="description" content="{{ full_name }} — Information Systems student at Universitas Indonesia.">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
+{% endblock meta %}
 
-    <a class="skip-link" href="#landing">Skip to content</a>
+{% block nav_home %}is-active{% endblock nav_home %}
 
-    <header class="site-nav" aria-label="Primary navigation">
-        <nav class="site-nav__links">
-            <a href="{% url 'main:show_main' %}" class="is-active" data-nav="HOME">HOME</a>
-            <a href="{% url 'main:show_experience' %}" data-nav="EXPERIENCE">EXP</a>
-            <a href="{% url 'main:show_project' %}" data-nav="PROJECT">PROJECT</a>
-        </nav>
-    </header>
-
+{% block content %}
     <main>
-
         <section class="screen" id="landing" aria-label="Landing">
             <div class="artboard landing">
                 <div class="screen__bg screen__bg--grid" aria-hidden="true"></div>
@@ -180,8 +167,4 @@
             </div>
         </section>
     </main>
-    <footer>
-        <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
-    </footer>
-</body>
-</html>
+{% endblock content %}

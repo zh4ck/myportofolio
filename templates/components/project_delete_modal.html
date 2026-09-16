@@ -1,0 +1,56 @@
+<div class="project-delete-trigger">
+    <button type="button"
+            class="project-delete-btn"
+            popovertarget="delete-project-{{ project.id }}"
+            aria-label="Hapus {{ project.name }}"
+            title="Hapus project">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+        </svg>
+    </button>
+</div>
+<div id="delete-project-{{ project.id }}"
+     class="project-delete-modal"
+     popover="auto"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="delete-project-title-{{ project.id }}">
+    <button type="button"
+            class="project-delete-modal__backdrop"
+            popovertarget="delete-project-{{ project.id }}"
+            popovertargetaction="hide"
+            aria-label="Tutup konfirmasi hapus"></button>
+    <div class="project-delete-modal__content">
+        <button type="button"
+                class="project-delete-modal__close"
+                popovertarget="delete-project-{{ project.id }}"
+                popovertargetaction="hide"
+                aria-label="Tutup konfirmasi hapus">×</button>
+        <h2 id="delete-project-title-{{ project.id }}" class="project-delete-modal__title">Hapus Project?</h2>
+        <p class="project-delete-modal__desc">
+            Apakah kamu yakin ingin menghapus <strong>{{ project.name }}</strong>?
+        </p>
+        <form method="post" action="{% url 'main:delete_project' project.id %}" class="project-delete-form">
+            {% csrf_token %}
+            <div class="project-delete-modal__field">
+                <label for="admin-key-{{ project.id }}" class="project-delete-modal__label">SECRET KEY</label>
+                <input type="password"
+                       id="admin-key-{{ project.id }}"
+                       name="admin_key"
+                       placeholder="Masukkan secret key..."
+                       class="project-delete-modal__input"
+                       required>
+            </div>
+            <div class="project-delete-modal__actions">
+                <button type="button"
+                        class="button button-modal-cancel"
+                        popovertarget="delete-project-{{ project.id }}"
+                        popovertargetaction="hide">Batal</button>
+                <button type="submit" class="button button-danger">Ya, Hapus</button>
+            </div>
+        </form>
+    </div>
+</div>

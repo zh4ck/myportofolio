@@ -1,27 +1,13 @@
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block meta %}
     <title>Project - {{ name }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
-    <a class="skip-link" href="#project">Skip to content</a>
+{% endblock meta %}
 
-    <header class="site-nav" aria-label="Primary navigation">
-        <nav class="site-nav__links">
-            <a href="{% url 'main:show_main' %}" data-nav="HOME">HOME</a>
-            <a href="{% url 'main:show_experience' %}" data-nav="EXPERIENCE">EXP</a>
-            <a href="{% url 'main:show_project' %}" class="is-active" data-nav="PROJECT">PROJECT</a>
-        </nav>
-    </header>
+{% block nav_project %}is-active{% endblock nav_project %}
 
+{% block content %}
     <main>
         <section class="screen project-screen" id="project" aria-label="Project">
             <div class="artboard project-artboard">
@@ -33,6 +19,24 @@
                     <h1 class="project__title">PROJECT</h1>
                 </div>
 
+                <div class="project-toolbar">
+                    <form method="get" action="{% url 'main:show_project' %}" class="project-search">
+                        <input type="search"
+                               name="title"
+                               value="{{ title_query }}"
+                               placeholder="Cari berdasarkan nama project..."
+                               class="project-search__input"
+                               aria-label="Cari berdasarkan nama project">
+                        <button type="submit" class="button">Cari</button>
+                        {% if title_query %}
+                            <a href="{% url 'main:show_project' %}" class="button button-secondary">Clear</a>
+                        {% endif %}
+                    </form>
+                    <a href="{% url 'main:create_project' %}" class="button">
+                        New Project
+                    </a>
+                </div>
+
                 <div class="project-container">
                     <div class="project-timeline">
                         {% for project in project_list %}
@@ -41,6 +45,8 @@
 
                                 <div class="project-card">
                                     <div class="project-card__glow" aria-hidden="true"></div>
+
+                                    {% include "components/project_delete_modal.html" with project=project %}
 
                                     <div class="project-card__photo">
                                         {% if project.thumbnail %}
@@ -71,7 +77,11 @@
                             </article>
                         {% empty %}
                             <div class="empty-state">
-                                <p class="empty-state__msg">Yang sabara ya boss</p>
+                                {% if title_query %}
+                                    <p class="empty-state__msg">Tidak ada project dengan nama "{{ title_query }}".</p>
+                                {% else %}
+                                    <p class="empty-state__msg">Belum ada project yang ditambahkan.</p>
+                                {% endif %}
                             </div>
                         {% endfor %}
                     </div>
@@ -83,9 +93,4 @@
             </div>
         </section>
     </main>
-
-    <footer class="site-footer">
-        <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
-    </footer>
-</body>
-</html>
+{% endblock content %}

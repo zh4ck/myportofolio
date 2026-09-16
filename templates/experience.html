@@ -1,27 +1,13 @@
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block meta %}
     <title>Experience - {{ name }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
-    <a class="skip-link" href="#experience">Skip to content</a>
+{% endblock meta %}
 
-    <header class="site-nav" aria-label="Primary navigation">
-        <nav class="site-nav__links">
-            <a href="{% url 'main:show_main' %}" data-nav="HOME">HOME</a>
-            <a href="{% url 'main:show_experience' %}" class="is-active" data-nav="EXPERIENCE">EXP</a>
-            <a href="{% url 'main:show_project' %}" data-nav="PROJECT">PROJECT</a>
-        </nav>
-    </header>
+{% block nav_exp %}is-active{% endblock nav_exp %}
 
+{% block content %}
     <main>
         <section class="screen experience-screen" id="experience" aria-label="Experience">
             <div class="artboard experience-artboard">
@@ -73,9 +59,4 @@
             </div>
         </section>
     </main>
-
-    <footer class="site-footer">
-        <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
-    </footer>
-</body>
-</html>
+{% endblock content %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block meta %}
+    <title>Add Project - {{ name }}</title>
+{% endblock meta %}
+
+{% block nav_project %}is-active{% endblock nav_project %}
+
+{% block content %}
+    <main>
+        <section class="screen form-screen" id="add-project" aria-label="Add New Project">
+            <div class="artboard form-artboard">
+                <div class="screen__bg screen__bg--grid" aria-hidden="true"></div>
+                <div class="form__orb" aria-hidden="true"></div>
+
+                <div class="form__header">
+                    <p class="section-kicker">Tambah project baru broski!</p>
+                    <h1 class="form__title">Add New Projects</h1>
+                </div>
+
+                <div class="form-container">
+                    <div class="form-card">
+                        <div class="form-card__glow" aria-hidden="true"></div>
+                        <form method="post"
+                              action="{% url 'main:create_project' %}"
+                              class="project-form">
+                            {% csrf_token %}
+                            {% for field in form %}
+                                <div class="form-group">
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% for error in field.errors %}
+                                        <p class="form-error">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+                            <div class="form-actions">
+                                <button type="submit" class="button">Tambah Project</button>
+                                <a href="{% url 'main:show_project' %}" class="button button-secondary">Batal</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <a class="screen-arrow" href="{% url 'main:show_project' %}" aria-label="Back to projects">
+                    <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M5 15l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+            </div>
+        </section>
+    </main>
+{% endblock content %}
