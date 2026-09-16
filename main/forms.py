@@ -87,48 +87,48 @@ class ProjectForm(ModelForm):
 
 
 # buat nanti
-# class ExperienceForm(ModelForm):
-#     class Meta:
-#         model = Experience
-#         fields = [
-#             "title",
-#             "description",
-#             "category",
-#             "thumbnail",
-#             "ended_at",
-#         ]
+class ExperienceForm(ModelForm):
+    class Meta:
+        model = Experience
+        fields = [
+            "title",
+            "description",
+            "category",
+            "thumbnail",
+            "ended_at",
+        ]
 
-#         labels = {
-#             "title": "Judul Experience",
-#             "description": "Deskripsi Experience",
-#             "category": "Kategori Experience",
-#             "thumbnail": "Thumbnail Experience",
-#             "ended_at": "Tanggal berakhirnya Experience",
-#         }
+        labels = {
+            "title": "Judul Experience",
+            "description": "Deskripsi Experience",
+            "category": "Kategori Experience",
+            "thumbnail": "Thumbnail Experience",
+            "ended_at": "Tanggal berakhirnya Experience",
+        }
 
-#         widgets = {
-#             "title": TextInput(
-#                 attrs={
-#                     "placeholder": "Internship di PT Skibidi Toilet",
-#                     "maxlength": 255,
-#                 }
-#             ),
-#             "description": Textarea(
-#                 attrs={
-#                     "placeholder": "Jadi gini der",
-#                     "rows": 3,
-#                 }
-#             ),
-#             "category": Select(),
-#             "thumbnail": URLInput(
-#                 attrs={
-#                     "placeholder": "https://drive.google.com/thumbnail?id=...&sz=w1000",
-#                 }
-#             ),
-#             "ended_at": DateTimeInput(
-#                 attrs={
-#                     "type": "datetime-local",
-#                 },
-#                 format="%Y-%m-%dT%H:%M",
-#             ),
-#         }
+        widgets = {
+            "title": TextInput(
+                attrs={
+                    "placeholder": "Internship di PT Skibidi Toilet",
+                    "maxlength": 255,
+                }
+            ),
+            "description": Textarea(
+                attrs={
+                    "placeholder": "Jadi gini der",
+                    "rows": 3,
+                }
+            ),
+            "category": Select(),
+            "thumbnail": URLInput(
+                attrs={
+                    "placeholder": "https://drive.google.com/thumbnail?id=...&sz=w1000",
+                }
+            ),
+            "ended_at": DateTimeInput(
+                attrs={
+                    "type": "datetime-local",
+                },
+                format="%Y-%m-%dT%H:%M",
+            ),
+        }
