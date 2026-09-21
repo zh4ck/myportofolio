@@ -19,11 +19,32 @@
                     <h1 class="experience__title">EXPERIENCE</h1>
                 </div>
 
+                <div class="project-toolbar">
+                    <form method="get" action="{% url 'main:show_experience' %}" class="project-search">
+                        <select name="category" class="project-search__input" aria-label="Filter berdasarkan kategori experience">
+                            <option value="">Semua kategori</option>
+                            {% for value, label in experience_categories %}
+                                <option value="{{ value }}" {% if category_query == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="button">Filter</button>
+                        {% if category_query %}
+                            <a href="{% url 'main:show_experience' %}" class="button button-secondary">Clear</a>
+                        {% endif %}
+                    </form>
+                    <a href="{% url 'main:create_experience' %}" class="button project-add-button">
+                        New Experience
+                    </a>
+                </div>
+
                 <div class="experience-container">
                     <div class="experience-grid">
                         {% for experience in experience_list %}
                             <article class="experience-card">
                                 <div class="experience-card__glow" aria-hidden="true"></div>
+
+                                {% include "components/experience_delete_modal.html" with experience=experience %}
+
                                 <div class="experience-card__header">
                                     <span class="experience-category">
                                         {{ experience.get_category_display }}
@@ -47,7 +68,11 @@
                             </article>
                         {% empty %}
                             <div class="empty-state">
-                                <p class="empty-state__msg">Belum ada pengalaman yang ditambahkan.</p>
+                                {% if category_query %}
+                                    <p class="empty-state__msg">Tidak ada experience dengan kategori "{{ category_query }}".</p>
+                                {% else %}
+                                    <p class="empty-state__msg">Belum ada pengalaman yang ditambahkan.</p>
+                                {% endif %}
                             </div>
                         {% endfor %}
                     </div>

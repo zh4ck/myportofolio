@@ -1,0 +1,65 @@
+<div class="experience-actions">
+    <a href="{% url 'main:update_experience' experience.id %}"
+       class="project-delete-btn"
+       aria-label="Ubah {{ experience.title }}"
+       title="Ubah experience">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+            <path d="m15 5 4 4"></path>
+        </svg>
+    </a>
+    <button type="button"
+            class="project-delete-btn"
+            popovertarget="delete-experience-{{ experience.id }}"
+            aria-label="Hapus {{ experience.title }}"
+            title="Hapus experience">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+        </svg>
+    </button>
+</div>
+<div id="delete-experience-{{ experience.id }}"
+     class="project-delete-modal"
+     popover="auto"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="delete-experience-title-{{ experience.id }}">
+    <button type="button"
+            class="project-delete-modal__backdrop"
+            popovertarget="delete-experience-{{ experience.id }}"
+            popovertargetaction="hide"
+            aria-label="Tutup konfirmasi hapus"></button>
+    <div class="project-delete-modal__content">
+        <button type="button"
+                class="project-delete-modal__close"
+                popovertarget="delete-experience-{{ experience.id }}"
+                popovertargetaction="hide"
+                aria-label="Tutup konfirmasi hapus">×</button>
+        <h2 id="delete-experience-title-{{ experience.id }}" class="project-delete-modal__title">Hapus Experience?</h2>
+        <p class="project-delete-modal__desc">
+            Apakah kamu yakin ingin menghapus <strong>{{ experience.title }}</strong>?
+        </p>
+        <form method="post" action="{% url 'main:delete_experience' experience.id %}" class="project-delete-form">
+            {% csrf_token %}
+            <div class="project-delete-modal__field">
+                <label for="admin-key-{{ experience.id }}" class="project-delete-modal__label">SECRET KEY</label>
+                <input type="password"
+                       id="admin-key-{{ experience.id }}"
+                       name="admin_key"
+                       placeholder="Masukkan secret key..."
+                       class="project-delete-modal__input"
+                       required>
+            </div>
+            <div class="project-delete-modal__actions">
+                <button type="button"
+                        class="button button-modal-cancel"
+                        popovertarget="delete-experience-{{ experience.id }}"
+                        popovertargetaction="hide">Batal</button>
+                <button type="submit" class="button button-danger">Ya, Hapus</button>
+            </div>
+        </form>
+    </div>
+</div>

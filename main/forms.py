@@ -86,8 +86,17 @@ class ProjectForm(ModelForm):
         return key
 
 
-# buat nanti
 class ExperienceForm(ModelForm):
+    admin_key = forms.CharField(
+        label="Admin Key",
+        widget=PasswordInput(
+            attrs={
+                "placeholder": "Masukkan kunci rahasia kamu cik...",
+            }
+        ),
+        required=True,
+    )
+
     class Meta:
         model = Experience
         fields = [
@@ -132,3 +141,10 @@ class ExperienceForm(ModelForm):
                 format="%Y-%m-%dT%H:%M",
             ),
         }
+
+    def clean_admin_key(self):
+        key = self.cleaned_data.get("admin_key")
+        expected_key = os.getenv("ADMIN_KEY")
+        if not expected_key or key != expected_key:
+            raise ValidationError("Key salah! Kamu siapa loh ya >:(")
+        return key

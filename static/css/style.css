@@ -908,6 +908,16 @@ ul { list-style: none; }
     z-index: 3;
 }
 
+.experience-actions {
+    position: absolute;
+    top: 0.24rem;
+    right: 0.26rem;
+    z-index: 3;
+    display: flex;
+    flex-direction: row;
+    gap: 0.08rem;
+}
+
 .project-delete-btn {
     display: grid;
     place-items: center;
