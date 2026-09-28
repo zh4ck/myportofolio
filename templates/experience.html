@@ -32,9 +32,11 @@
                             <a href="{% url 'main:show_experience' %}" class="button button-secondary">Clear</a>
                         {% endif %}
                     </form>
-                    <a href="{% url 'main:create_experience' %}" class="button project-add-button">
-                        New Experience
-                    </a>
+                    {% if user.is_superuser %}
+                        <a href="{% url 'main:create_experience' %}" class="button project-add-button">
+                            New Experience
+                        </a>
+                    {% endif %}
                 </div>
 
                 <div class="experience-container">

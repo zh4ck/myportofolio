@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -182,3 +182,168 @@ class AuthorizationAndStarTest(TestCase):
         response = self.client.get(reverse("main:get_projects_json"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '["regular_user"]')
+
+
+class ExperienceAuthorizationAndRolesTest(TestCase):
+    def setUp(self):
+        self.regular_user = User.objects.create_user(
+            username="regular_user",
+            password="Password123!",
+        )
+        self.editor_user = User.objects.create_user(
+            username="editor_user",
+            password="Password123!",
+        )
+        self.editor_group, _ = Group.objects.get_or_create(name="Editor")
+        self.editor_user.groups.add(self.editor_group)
+
+        self.superuser = User.objects.create_superuser(
+            username="superuser",
+            password="Password123!",
+            email="admin@example.com",
+        )
+        self.experience = Experience.objects.create(
+            title="Software Engineering Intern",
+            description="Working on full-stack web applications.",
+            category="internship",
+        )
+
+    # 1. Anonymous (Pengunjung tanpa login)
+    def test_anonymous_can_read_experience(self):
+        response = self.client.get(reverse("main:show_experience"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.experience.title)
+        self.assertNotContains(response, reverse("main:create_experience"))
+        self.assertNotContains(response, reverse("main:update_experience", args=[self.experience.id]))
+
+    def test_anonymous_redirected_on_actions(self):
+        add_resp = self.client.get(reverse("main:create_experience"))
+        self.assertEqual(add_resp.status_code, 302)
+        self.assertTrue(add_resp.url.startswith("/login/"))
+
+        edit_resp = self.client.get(reverse("main:update_experience", args=[self.experience.id]))
+        self.assertEqual(edit_resp.status_code, 302)
+        self.assertTrue(edit_resp.url.startswith("/login/"))
+
+        del_resp = self.client.post(reverse("main:delete_experience", args=[self.experience.id]))
+        self.assertEqual(del_resp.status_code, 302)
+        self.assertTrue(del_resp.url.startswith("/login/"))
+
+        star_resp = self.client.post(reverse("main:toggle_star_experience", args=[self.experience.id]))
+        self.assertEqual(star_resp.status_code, 302)
+        self.assertTrue(star_resp.url.startswith("/login/"))
+
+    # 2. Regular User (Pengguna biasa)
+    def test_regular_user_cannot_create_update_or_delete(self):
+        self.client.login(username="regular_user", password="Password123!")
+
+        self.assertEqual(self.client.get(reverse("main:create_experience")).status_code, 403)
+        self.assertEqual(self.client.get(reverse("main:update_experience", args=[self.experience.id])).status_code, 403)
+        self.assertEqual(self.client.post(reverse("main:delete_experience", args=[self.experience.id])).status_code, 403)
+
+    def test_regular_user_can_star_and_unstar(self):
+        self.client.login(username="regular_user", password="Password123!")
+
+        # Star
+        response = self.client.post(reverse("main:toggle_star_experience", args=[self.experience.id]))
+        self.assertEqual(response.status_code, 302)
+        self.experience.refresh_from_db()
+        self.assertIn(self.regular_user, self.experience.starred_by.all())
+
+        # Unstar
+        response = self.client.post(reverse("main:toggle_star_experience", args=[self.experience.id]))
+        self.assertEqual(response.status_code, 302)
+        self.experience.refresh_from_db()
+        self.assertNotIn(self.regular_user, self.experience.starred_by.all())
+
+    def test_regular_user_template_controls(self):
+        self.client.login(username="regular_user", password="Password123!")
+        response = self.client.get(reverse("main:show_experience"))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, reverse("main:create_experience"))
+        self.assertNotContains(response, reverse("main:update_experience", args=[self.experience.id]))
+
+    # 3. Editor
+    def test_editor_can_update_experience(self):
+        self.client.login(username="editor_user", password="Password123!")
+
+        # Can access update form
+        get_resp = self.client.get(reverse("main:update_experience", args=[self.experience.id]))
+        self.assertEqual(get_resp.status_code, 200)
+
+        # Can submit update form
+        post_resp = self.client.post(
+            reverse("main:update_experience", args=[self.experience.id]),
+            {
+                "title": "Senior Engineering Intern",
+                "description": "Leading full-stack modules.",
+                "category": "internship",
+            },
+        )
+        self.assertEqual(post_resp.status_code, 302)
+        self.experience.refresh_from_db()
+        self.assertEqual(self.experience.title, "Senior Engineering Intern")
+
+    def test_editor_cannot_create_or_delete_experience(self):
+        self.client.login(username="editor_user", password="Password123!")
+
+        self.assertEqual(self.client.get(reverse("main:create_experience")).status_code, 403)
+        self.assertEqual(self.client.post(reverse("main:delete_experience", args=[self.experience.id])).status_code, 403)
+
+    def test_editor_template_controls(self):
+        self.client.login(username="editor_user", password="Password123!")
+        response = self.client.get(reverse("main:show_experience"))
+        self.assertEqual(response.status_code, 200)
+        # Edit link is visible
+        self.assertContains(response, reverse("main:update_experience", args=[self.experience.id]))
+        # New experience is hidden
+        self.assertNotContains(response, reverse("main:create_experience"))
+
+    # 4. Superuser (Pemilik portofolio)
+    def test_superuser_has_all_privileges(self):
+        self.client.login(username="superuser", password="Password123!")
+
+        # Create
+        create_resp = self.client.post(
+            reverse("main:create_experience"),
+            {
+                "title": "Teaching Assistant",
+                "description": "Lab instructor.",
+                "category": "part-time",
+            },
+        )
+        self.assertEqual(create_resp.status_code, 302)
+        self.assertTrue(Experience.objects.filter(title="Teaching Assistant").exists())
+
+        # Update
+        update_resp = self.client.post(
+            reverse("main:update_experience", args=[self.experience.id]),
+            {
+                "title": "Updated by Superuser",
+                "description": "Superuser update.",
+                "category": "internship",
+            },
+        )
+        self.assertEqual(update_resp.status_code, 302)
+        self.experience.refresh_from_db()
+        self.assertEqual(self.experience.title, "Updated by Superuser")
+
+        # Delete
+        delete_resp = self.client.post(reverse("main:delete_experience", args=[self.experience.id]))
+        self.assertEqual(delete_resp.status_code, 302)
+        self.assertFalse(Experience.objects.filter(id=self.experience.id).exists())
+
+    def test_superuser_template_controls(self):
+        self.client.login(username="superuser", password="Password123!")
+        response = self.client.get(reverse("main:show_experience"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, reverse("main:create_experience"))
+        self.assertContains(response, reverse("main:update_experience", args=[self.experience.id]))
+
+    # 5. API Natural Foreign Keys
+    def test_api_experience_json_uses_natural_foreign_keys(self):
+        self.experience.starred_by.add(self.regular_user)
+        response = self.client.get(reverse("main:get_experience_json"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '["regular_user"]')
+

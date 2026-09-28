@@ -22,7 +22,7 @@ class ProjectForm(ModelForm):
                 "placeholder": "Masukkan kunci rahasia kamu cik...",
             }
         ),
-        required=True,
+        required=False,
     )
 
     class Meta:
@@ -81,7 +81,7 @@ class ProjectForm(ModelForm):
     def clean_admin_key(self):
         key = self.cleaned_data.get("admin_key")
         expected_key = os.getenv("ADMIN_KEY")
-        if not expected_key or key != expected_key:
+        if expected_key and key and key != expected_key:
             raise ValidationError("Key salah! Kamu siapa loh ya >:(")
         return key
 
@@ -94,7 +94,7 @@ class ExperienceForm(ModelForm):
                 "placeholder": "Masukkan kunci rahasia kamu cik...",
             }
         ),
-        required=True,
+        required=False,
     )
 
     class Meta:
@@ -145,6 +145,6 @@ class ExperienceForm(ModelForm):
     def clean_admin_key(self):
         key = self.cleaned_data.get("admin_key")
         expected_key = os.getenv("ADMIN_KEY")
-        if not expected_key or key != expected_key:
+        if expected_key and key and key != expected_key:
             raise ValidationError("Key salah! Kamu siapa loh ya >:(")
         return key
