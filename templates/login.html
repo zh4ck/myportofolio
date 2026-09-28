@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block meta %}
+    <title>Login - {{ name }}</title>
+{% endblock meta %}
+
+{% block content %}
+    <main>
+        <section class="screen experience-screen">
+            <div class="artboard experience-artboard">
+                <div class="screen__bg screen__bg--grid" aria-hidden="true"></div>
+
+                <div class="form__header">
+                    <h1 class="form__title">LOGIN</h1>
+                </div>
+
+                <div class="form-container">
+                    <div class="form-card">
+                        {% for message in messages %}
+                            <p class="form-message">{{ message }}</p>
+                        {% endfor %}
+                        <form method="post" action="{% url 'main:login' %}" class="project-form">
+                            {% csrf_token %}
+                            {% for error in form.non_field_errors %}
+                                <p class="form-error">{{ error }}</p>
+                            {% endfor %}
+                            {% for field in form %}
+                                <div class="form-group">
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.help_text %}
+                                        <div class="form-help">{{ field.help_text|safe }}</div>
+                                    {% endif %}
+                                    {% for error in field.errors %}
+                                        <p class="form-error">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+                            <button type="submit" class="button">Login</button>
+                        </form>
+                        <p>Belum punya akun? <a href="{% url 'main:register' %}">Daftar di sini</a>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

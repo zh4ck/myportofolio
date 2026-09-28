@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -87,5 +88,97 @@ class ProjectTest(TestCase):
         Projects.objects.all().delete()
         response = self.client.get(reverse("main:show_project"))
 
-        self.assertContains(response, "Yang sabara ya boss")
+        self.assertContains(response, "Belum ada project yang ditambahkan.")
         self.assertNotContains(response, self.project.name)
+
+
+class AuthTest(TestCase):
+    def setUp(self):
+        self.username = "whatTheSigma"
+        self.password = "skibidi67$"
+        self.user = User.objects.create_user(
+            username=self.username,
+            password=self.password,
+        )
+
+    def test_register_page_accessible(self):
+        response = self.client.get(reverse("main:register"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "register.html")
+
+    def test_login_page_accessible(self):
+        response = self.client.get(reverse("main:login"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "login.html")
+
+    def test_login_success_sets_cookie_and_redirects(self):
+        response = self.client.post(
+            reverse("main:login"),
+            {"username": self.username, "password": self.password},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("last_login", response.cookies)
+        self.assertIn("_auth_user_id", self.client.session)
+
+    def test_logout_clears_cookie_and_session(self):
+        self.client.login(username=self.username, password=self.password)
+        self.client.cookies["last_login"] = "2026-09-28 12:00:00"
+        response = self.client.get(reverse("main:logout"))
+        self.assertEqual(response.status_code, 302)
+        self.assertNotIn("_auth_user_id", self.client.session)
+        self.assertEqual(response.cookies["last_login"].value, "")
+
+
+class AuthorizationAndStarTest(TestCase):
+    def setUp(self):
+        self.regular_user = User.objects.create_user(
+            username="regular_user",
+            password="skibidi123!",
+        )
+        self.superuser = User.objects.create_superuser(
+            username="admin_user",
+            password="whatthesigma123!",
+            email="admin@example.com",
+        )
+        self.project = Projects.objects.create(
+            name="Testing Authorization",
+            description="Testing authorization features",
+            category="web-development",
+        )
+
+    def test_unauthenticated_cannot_create_project(self):
+        response = self.client.get(reverse("main:create_project"))
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.startswith("/login/"))
+
+    def test_regular_user_cannot_create_project(self):
+        self.client.login(username="regular_user", password="skibidi123!")
+        response = self.client.get(reverse("main:create_project"))
+        self.assertEqual(response.status_code, 403)
+
+    def test_superuser_can_access_create_project(self):
+        self.client.login(username="admin_user", password="whatthesigma123!")
+        response = self.client.get(reverse("main:create_project"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_toggle_star_authenticated(self):
+        self.client.login(username="regular_user", password="skibidi123!")
+        response = self.client.post(
+            reverse("main:toggle_star", args=[self.project.id])
+        )
+        self.assertEqual(response.status_code, 302)
+        self.project.refresh_from_db()
+        self.assertIn(self.regular_user, self.project.starred_by.all())
+
+        response = self.client.post(
+            reverse("main:toggle_star", args=[self.project.id])
+        )
+        self.assertEqual(response.status_code, 302)
+        self.project.refresh_from_db()
+        self.assertNotIn(self.regular_user, self.project.starred_by.all())
+
+    def test_api_projects_json_uses_natural_foreign_keys(self):
+        self.project.starred_by.add(self.regular_user)
+        response = self.client.get(reverse("main:get_projects_json"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '["regular_user"]')
