@@ -20,79 +20,40 @@
                 </div>
 
                 <div class="project-toolbar">
-                    <form method="get" action="{% url 'main:show_project' %}" class="project-search">
+                    <form id="project-search-form" class="project-search">
                         <input type="search"
+                               id="search-input"
                                name="title"
                                value="{{ title_query }}"
                                placeholder="Cari berdasarkan nama project..."
                                class="project-search__input"
                                aria-label="Cari berdasarkan nama project">
                         <button type="submit" class="button">Cari</button>
-                        {% if title_query %}
-                            <a href="{% url 'main:show_project' %}" class="button button-secondary">Clear</a>
-                        {% endif %}
                     </form>
                     {% if user.is_superuser %}
-                        <a href="{% url 'main:create_project' %}" class="button project-add-button">
+                        <button type="button"
+                                class="button project-add-button"
+                                popovertarget="add-project-modal">
                             <span aria-hidden="true">+</span>
                             Tambah Proyek
-                        </a>
+                        </button>
                     {% endif %}
                 </div>
 
                 <div class="project-container">
-                    <div class="project-timeline">
-                        {% for project in project_list %}
-                            <article class="project-item">
-                                <span class="project-item__dot" aria-hidden="true"></span>
-
-                                <div class="project-card">
-                                    <div class="project-card__glow" aria-hidden="true"></div>
-
-                                    <div class="project-actions">
-                                        {% include "components/project_star.html" with project=project %}
-                                        {% if user.is_superuser %}
-                                            {% include "components/project_delete_modal.html" with project=project %}
-                                        {% endif %}
-                                    </div>
-
-                                    <div class="project-card__photo">
-                                        {% if project.thumbnail %}
-                                            {% if project.thumbnail|slice:":4" == "http" %}
-                                                <img src="{{ project.thumbnail }}" alt="{{ project.name }}">
-                                            {% else %}
-                                                <img src="{% static project.thumbnail %}" alt="{{ project.name }}">
-                                            {% endif %}
-                                        {% else %}
-                                            <span class="project-card__photo-fallback" aria-hidden="true">{{ project.name|slice:":1" }}</span>
-                                        {% endif %}
-                                    </div>
-
-                                    <div class="project-card__body">
-                                        <div class="project-card__top">
-                                            <h2 class="project-card__name">{{ project.name }}</h2>
-                                            <span class="project-category">{{ project.get_category_display }}</span>
-                                        </div>
-
-                                        <p class="project-card__dates">
-                                            {{ project.date_start|date:"M Y" }} &ndash;
-                                            {% if project.is_ongoing %}Present{% else %}{{ project.date_end|date:"M Y" }}{% endif %}
-                                        </p>
-
-                                        <p class="project-card__description">{{ project.description }}</p>
-                                    </div>
-                                </div>
-                            </article>
-                        {% empty %}
-                            <div class="empty-state">
-                                {% if title_query %}
-                                    <p class="empty-state__msg">Tidak ada project dengan nama "{{ title_query }}".</p>
-                                {% else %}
-                                    <p class="empty-state__msg">Belum ada project yang ditambahkan.</p>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
+                    <div id="loading" class="empty-state hide">
+                        <p class="empty-state__msg">Memuat projects...</p>
                     </div>
+
+                    <div id="error" class="empty-state hide">
+                        <p class="empty-state__msg">Gagal memuat data projects. Silakan coba lagi.</p>
+                    </div>
+
+                    <div id="empty" class="empty-state hide">
+                        <p class="empty-state__msg">Belum ada proyek yang ditambahkan atau ditemukan.</p>
+                    </div>
+
+                    <div id="grid" class="project-timeline hide"></div>
                 </div>
 
                 <a class="screen-arrow" href="{% url 'main:show_main' %}" aria-label="Back to home">
@@ -101,4 +62,238 @@
             </div>
         </section>
     </main>
+
+    {% if user.is_superuser %}
+        {% include "components/project_form_modal.html" %}
+    {% endif %}
+
+    <script>
+    const BASE_PROJECTS_ENDPOINT = "{% url 'main:get_projects_json' %}";
+    const CREATE_PROJECT_ENDPOINT = "{% url 'main:create_project_ajax' %}";
+    const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
+    let projectsAbortController;
+
+    const loadingState = document.getElementById('loading');
+    const errorState = document.getElementById('error');
+    const emptyState = document.getElementById('empty');
+    const gridContainer = document.getElementById('grid');
+    const searchForm = document.getElementById('project-search-form');
+    const searchInput = document.getElementById('search-input');
+    const projectForm = document.getElementById('project-form');
+
+    const SEARCH_DEBOUNCE_DELAY = 300;
+    let searchDebounceTimer;
+
+    function displayPageSection({ showLoading = false, showError = false, showEmpty = false, showGrid = false }) {
+        loadingState.classList.toggle('hide', !showLoading);
+        errorState.classList.toggle('hide', !showError);
+        emptyState.classList.toggle('hide', !showEmpty);
+        gridContainer.classList.toggle('hide', !showGrid);
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#39;');
+    }
+
+    function buildProjectCardElement(item) {
+        const project = item.fields;
+        const projectId = item.pk;
+
+        const articleElement = document.createElement('article');
+        articleElement.className = 'project-item experience-card';
+
+        const title = project.name || project.title || '';
+        const category = project.category_display || project.category || project.tech_stack || '';
+        const description = project.description || '';
+        const imageUrl = project.thumbnail || project.project_image_url || '';
+        const dates = project.date_display || (project.date_start_formatted ? `${project.date_start_formatted} – ${project.date_end_formatted}` : '');
+
+        const photoHtml = imageUrl
+            ? `<div class="project-card__photo">
+                 <img src="${escapeHtml(imageUrl)}" alt="Gambar ${escapeHtml(title)}" class="project-image">
+               </div>`
+            : `<div class="project-card__photo">
+                 <span class="project-card__photo-fallback" aria-hidden="true">${escapeHtml(title.slice(0, 1))}</span>
+               </div>`;
+
+        const deleteUrl = "{% url 'main:delete_project' '00000000-0000-0000-0000-000000000000' %}"
+            .replace('00000000-0000-0000-0000-000000000000', projectId);
+        const starUrl = "{% url 'main:toggle_star' '00000000-0000-0000-0000-000000000000' %}"
+            .replace('00000000-0000-0000-0000-000000000000', projectId);
+
+        const deleteHtml = IS_SUPERUSER 
+            ? `<form method="post" action="${deleteUrl}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="button button-danger button-sm" onclick="return confirm('Yakin ingin menghapus project ini?');">Hapus</button>
+            </form>`
+            : '';
+
+        const isStarredClass = project.is_starred ? " is-starred" : "";
+        const starText = project.is_starred ? "Unstar" : "Star";
+        const starTitle = project.star_count > 0 
+            ? `Dibintangi oleh ${escapeHtml(project.starred_by_names)}` 
+            : "Jadilah yang pertama memberi star";
+
+        const datesHtml = dates 
+            ? `<p class="project-card__dates">${escapeHtml(dates)}</p>` 
+            : '';
+
+        const completeCardHtml = `
+            <span class="project-item__dot" aria-hidden="true"></span>
+            <div class="project-card">
+                <div class="project-card__glow" aria-hidden="true"></div>
+
+                <div class="project-actions">
+                    <form method="post" action="${starUrl}" class="star-form">
+                        {% csrf_token %}
+                        <button type="submit" 
+                                class="button button-star${isStarredClass}"
+                                title="${starTitle}">
+                            <span aria-hidden="true">★</span>
+                            ${starText}
+                            <span class="star-count">${project.star_count}</span>
+                        </button>
+                    </form>
+                    ${deleteHtml}
+                </div>
+
+                ${photoHtml}
+
+                <div class="project-card__body">
+                    <div class="project-card__top">
+                        <h2 class="project-card__name">${escapeHtml(title)}</h2>
+                        <span class="project-category experience-category">${escapeHtml(category)}</span>
+                    </div>
+                    ${datesHtml}
+                    <p class="project-card__description experience-description">${escapeHtml(description)}</p>
+                </div>
+            </div>
+        `;
+
+        articleElement.innerHTML = completeCardHtml;
+        return articleElement;
+    }
+
+    async function fetchProjects(searchQuery = "") {
+        if (projectsAbortController) projectsAbortController.abort();
+        projectsAbortController = new AbortController();
+
+        try {
+            displayPageSection({ showLoading: true });
+            
+            const url = searchQuery ? `${BASE_PROJECTS_ENDPOINT}?title=${encodeURIComponent(searchQuery)}` : BASE_PROJECTS_ENDPOINT;
+            
+            const response = await fetch(url, {
+                headers: { 'Accept': 'application/json' },
+                signal: projectsAbortController.signal,
+            });
+
+            if (!response.ok) throw new Error('Failed to fetch data');
+
+            const projectData = await response.json();
+
+            if (projectData.length === 0) {
+                displayPageSection({ showEmpty: true });
+            } else {
+                gridContainer.innerHTML = '';
+                projectData.forEach(item => {
+                    gridContainer.appendChild(buildProjectCardElement(item));
+                });
+                displayPageSection({ showGrid: true });
+            }
+        } catch (error) {
+            if (error.name === 'AbortError') return;
+            console.error('Error loading projects:', error);
+            displayPageSection({ showError: true });
+        }
+    }
+
+    function searchProjects() {
+        fetchProjects(searchInput ? searchInput.value.trim() : "");
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener("input", function() {
+            clearTimeout(searchDebounceTimer);
+
+            searchDebounceTimer = setTimeout(function() {
+                searchProjects();
+            }, SEARCH_DEBOUNCE_DELAY);
+        });
+    }
+
+    if (searchForm) {
+        searchForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+            clearTimeout(searchDebounceTimer);
+            searchProjects();
+        });
+    }
+
+    function closeProjectModal() {
+        const modal = document.getElementById("add-project-modal");
+        if (modal && typeof modal.hidePopover === 'function') {
+            modal.hidePopover();
+        }
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    async function addProject(event) {
+        event.preventDefault();
+
+        const submitButton = projectForm.querySelector('button[type="submit"]');
+        if (submitButton) submitButton.disabled = true;
+
+        try {
+            const response = await fetch(CREATE_PROJECT_ENDPOINT, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                body: new FormData(projectForm),
+            });
+            const result = await response.json().catch(() => ({}));
+
+            if (response.ok) {
+                projectForm.reset();
+                closeProjectModal();
+                showToast('Berhasil', 'Proyek baru berhasil ditambahkan!', 'success');
+                fetchProjects(searchInput ? searchInput.value.trim() : '');
+            } else {
+                const errorMessages = result.errors
+                    ? Object.values(result.errors).flat().map(error => error.message)
+                    : [result.message || `Terjadi kesalahan (status ${response.status}).`];
+                showToast('Gagal menambahkan proyek', errorMessages.join(' '), 'error');
+            }
+        } catch (error) {
+            console.error('Error adding project:', error);
+            showToast('Gagal menambahkan proyek', 'Tidak dapat terhubung ke server. Silakan coba lagi.', 'error');
+        } finally {
+            if (submitButton) submitButton.disabled = false;
+        }
+    }
+
+    if (projectForm) {
+        projectForm.addEventListener('submit', addProject);
+    }
+
+    fetchProjects(searchInput ? searchInput.value.trim() : '');
+    </script>
 {% endblock content %}

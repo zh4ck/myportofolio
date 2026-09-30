@@ -10,6 +10,8 @@ from django.forms import (
     DateTimeInput,
     PasswordInput,
 )
+from django.utils import timezone
+from django.utils.html import strip_tags
 
 from main.models import Experience, Projects
 
@@ -77,6 +79,43 @@ class ProjectForm(ModelForm):
                 format="%Y-%m-%dT%H:%M",
             ),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if "date_start" in self.fields:
+            self.fields["date_start"].required = False
+        if "category" in self.fields:
+            self.fields["category"].required = False
+
+    def clean_name(self):
+        name = strip_tags(self.cleaned_data.get("name", "")).strip()
+        if not name:
+            raise ValidationError("Nama proyek tidak boleh hanya berisi tag HTML.")
+        return name
+
+    def clean_title(self):
+        title = strip_tags(str(self.cleaned_data.get("title", self.cleaned_data.get("name", "")))).strip()
+        if not title:
+            raise ValidationError("Nama proyek tidak boleh hanya berisi tag HTML.")
+        return title
+
+    def clean_category(self):
+        val = self.cleaned_data.get("category")
+        if not val:
+            return "others"
+        return strip_tags(str(val)).strip()
+
+    def clean_tech_stack(self):
+        return strip_tags(str(self.cleaned_data.get("tech_stack", ""))).strip()
+
+    def clean_description(self):
+        return strip_tags(self.cleaned_data.get("description", "")).strip()
+
+    def clean_date_start(self):
+        val = self.cleaned_data.get("date_start")
+        if not val:
+            return timezone.now()
+        return val
 
     def clean_admin_key(self):
         key = self.cleaned_data.get("admin_key")

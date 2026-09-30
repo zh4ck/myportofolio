@@ -7,8 +7,10 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core import serializers
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
+from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 from main.models import Experience, Projects
 from main.forms import ProjectForm, ExperienceForm
@@ -138,22 +140,19 @@ def toggle_star_experience(request, experience_id):
 
     return redirect("main:show_experience")
 
-    return redirect("main:show_experience")
-
 
 def show_project(request):
     title_query = request.GET.get("title", "").strip()
-    projects = Projects.objects.all().order_by("-date_start")
-
-    if title_query:
-        projects = projects.filter(name__icontains=title_query)
 
     context = {
         "name": "Zayyan",
-        "project_list": projects,
         "title_query": title_query,
+        "form": ProjectForm(),
     }
     return render(request, "project.html", context)
+
+show_projects = show_project
+
 
 @login_required(login_url="/login/")
 def create_project(request):
@@ -163,7 +162,10 @@ def create_project(request):
     form = ProjectForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        form.save()
+        project = form.save(commit=False)
+        if not project.date_start:
+            project.date_start = timezone.now()
+        project.save()
         messages.success(request, "Proyek baru berhasil ditambahkan!")
         return redirect("main:show_project")
 
@@ -173,15 +175,84 @@ def create_project(request):
     }
     return render(request, "projects_form.html", context)
 
+
+@require_POST
+def create_project_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Hanya pemilik portofolio yang dapat menambahkan proyek."},
+            status=403,
+        )
+
+    post_data = request.POST.copy()
+    if "title" in post_data and "name" not in post_data:
+        post_data["name"] = post_data["title"]
+    if "tech_stack" in post_data and "category" not in post_data:
+        post_data["category"] = post_data["tech_stack"]
+    if "project_image_url" in post_data and "thumbnail" not in post_data:
+        post_data["thumbnail"] = post_data["project_image_url"]
+
+    form = ProjectForm(post_data)
+    if form.is_valid():
+        project = form.save(commit=False)
+        if not project.date_start:
+            project.date_start = timezone.now()
+        project.save()
+        return JsonResponse(
+            {"message": "Proyek berhasil ditambahkan.", "pk": str(project.id)},
+            status=201,
+        )
+
+    errors = form.errors.get_json_data()
+    if "name" in errors and "title" not in errors:
+        errors["title"] = errors["name"]
+    return JsonResponse({"errors": errors}, status=400)
+
+
 def get_projects_json(request):
     title_query = request.GET.get("title", "").strip()
-    projects = Projects.objects.all()
+    projects = Projects.objects.prefetch_related("starred_by").all().order_by("-date_start")
 
     if title_query:
         projects = projects.filter(name__icontains=title_query)
 
-    projects_json = serializers.serialize("json", projects, use_natural_foreign_keys=True)
-    return HttpResponse(projects_json, content_type="application/json")
+    data = []
+    for project in projects:
+        starred_users = project.starred_by.all()
+        is_starred = request.user in starred_users if request.user.is_authenticated else False
+        starred_by_names = ", ".join([u.username for u in starred_users])
+        starred_by_list = [u.username for u in starred_users]
+
+        date_start_str = project.date_start.strftime("%b %Y") if project.date_start else ""
+        date_end_str = "Present" if project.is_ongoing else (project.date_end.strftime("%b %Y") if project.date_end else "")
+        date_display = f"{date_start_str} – {date_end_str}" if date_start_str else ""
+
+        data.append({
+            "pk": str(project.id),
+            "fields": {
+                "name": project.name,
+                "title": project.name,
+                "description": project.description,
+                "category": project.category,
+                "category_display": project.get_category_display(),
+                "tech_stack": project.get_category_display(),
+                "thumbnail": project.thumbnail,
+                "project_image_url": project.thumbnail,
+                "project_url": project.thumbnail or "",
+                "date_start": project.date_start.isoformat() if project.date_start else None,
+                "date_end": project.date_end.isoformat() if project.date_end else None,
+                "date_start_formatted": date_start_str,
+                "date_end_formatted": date_end_str,
+                "date_display": date_display,
+                "is_ongoing": project.is_ongoing,
+                "star_count": starred_users.count(),
+                "is_starred": is_starred,
+                "starred_by_names": starred_by_names,
+                "starred_by": starred_by_list,
+            },
+        })
+
+    return JsonResponse(data, safe=False)
 
 @login_required(login_url="/login/")
 def delete_project(request, project_id):

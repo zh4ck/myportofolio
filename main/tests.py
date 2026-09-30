@@ -70,26 +70,77 @@ class ProjectTest(TestCase):
             category="web-development",
             date_start=timezone.now() - timedelta(days=30),
         )
+        self.superuser = User.objects.create_superuser(
+            username="admin_user_proj",
+            password="Password123!",
+            email="admin_proj@example.com",
+        )
+        self.regular_user = User.objects.create_user(
+            username="regular_user_proj",
+            password="Password123!",
+        )
 
     def test_project_url_is_accessible(self):
         response = self.client.get(reverse("main:show_project"))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "project.html")
+        self.assertContains(response, 'id="project-search-form"')
+        self.assertContains(response, 'id="grid"')
+        self.assertContains(response, 'id="loading"')
+        self.assertContains(response, 'id="empty"')
 
-    def test_project_page_shows_data_when_exists(self):
-        response = self.client.get(reverse("main:show_project"))
+    def test_get_projects_json_shows_data_when_exists(self):
+        response = self.client.get(reverse("main:get_projects_json"))
 
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.project.name)
         self.assertContains(response, self.project.description)
-        self.assertContains(response, "Web Development")
+        self.assertContains(response, "web-development")
 
-    def test_empty_project_page_shows_empty_state(self):
+    def test_empty_get_projects_json_returns_empty_list(self):
         Projects.objects.all().delete()
-        response = self.client.get(reverse("main:show_project"))
+        response = self.client.get(reverse("main:get_projects_json"))
 
-        self.assertContains(response, "Belum ada project yang ditambahkan.")
-        self.assertNotContains(response, self.project.name)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), [])
+
+    def test_create_project_ajax_superuser(self):
+        self.client.login(username="admin_user_proj", password="Password123!")
+        response = self.client.post(
+            reverse("main:create_project_ajax"),
+            {
+                "name": "New AJAX Project",
+                "description": "Created with AJAX",
+                "category": "web-development",
+            },
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(Projects.objects.filter(name="New AJAX Project").exists())
+
+    def test_create_project_ajax_regular_user_forbidden(self):
+        self.client.login(username="regular_user_proj", password="Password123!")
+        response = self.client.post(
+            reverse("main:create_project_ajax"),
+            {
+                "name": "Unauthorized Project",
+                "description": "Should fail",
+                "category": "web-development",
+            },
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_create_project_ajax_xss_stripped(self):
+        self.client.login(username="admin_user_proj", password="Password123!")
+        response = self.client.post(
+            reverse("main:create_project_ajax"),
+            {
+                "name": "<img src='x' onerror='alert(1)'>",
+                "description": "XSS attempt",
+                "category": "web-development",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
 
 
 class AuthTest(TestCase):
