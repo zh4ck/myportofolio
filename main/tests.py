@@ -39,26 +39,28 @@ class MainTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "experience.html")
-        self.assertContains(response, self.experience.title)
-        self.assertContains(response, self.experience.description)
-        self.assertContains(response, "Part-Time")
-        self.assertContains(response, "Ongoing")
+        self.assertContains(response, 'id="experience-search-form"')
+        self.assertContains(response, 'id="grid"')
+        self.assertContains(response, 'id="loading"')
+        self.assertContains(response, 'id="empty"')
         self.assertContains(response, f'href="{reverse("main:show_main")}"')
 
     def test_empty_experience_page(self):
         Experience.objects.all().delete()
-        response = self.client.get(reverse("main:show_experience"))
+        response = self.client.get(reverse("main:get_experience_json"))
 
-        self.assertContains(response, "Belum ada pengalaman yang ditambahkan.")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), [])
 
     def test_completed_experience(self):
         self.experience.ended_at = timezone.now()
         self.experience.save()
-        response = self.client.get(reverse("main:show_experience"))
+        response = self.client.get(reverse("main:get_experience_json"))
 
         self.assertFalse(self.experience.is_ongoing)
-        self.assertContains(response, "Finished")
-        self.assertNotContains(response, "Ongoing")
+        data = response.json()
+        self.assertFalse(data[0]["fields"]["is_ongoing"])
+        self.assertEqual(data[0]["fields"]["status_display"], "Finished")
 
 # buat test project
 
@@ -263,9 +265,14 @@ class ExperienceAuthorizationAndRolesTest(TestCase):
     def test_anonymous_can_read_experience(self):
         response = self.client.get(reverse("main:show_experience"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.experience.title)
+        self.assertContains(response, 'id="experience-search-form"')
         self.assertNotContains(response, reverse("main:create_experience"))
-        self.assertNotContains(response, reverse("main:update_experience", args=[self.experience.id]))
+        self.assertNotContains(response, 'id="add-experience-modal"')
+        self.assertNotContains(response, 'popovertarget="add-experience-modal"')
+
+        json_resp = self.client.get(reverse("main:get_experience_json"))
+        self.assertEqual(json_resp.status_code, 200)
+        self.assertContains(json_resp, self.experience.title)
 
     def test_anonymous_redirected_on_actions(self):
         add_resp = self.client.get(reverse("main:create_experience"))
@@ -345,10 +352,12 @@ class ExperienceAuthorizationAndRolesTest(TestCase):
         self.client.login(username="editor_user", password="Password123!")
         response = self.client.get(reverse("main:show_experience"))
         self.assertEqual(response.status_code, 200)
-        # Edit link is visible
-        self.assertContains(response, reverse("main:update_experience", args=[self.experience.id]))
-        # New experience is hidden
-        self.assertNotContains(response, reverse("main:create_experience"))
+        self.assertNotContains(response, 'id="add-experience-modal"')
+        self.assertNotContains(response, 'popovertarget="add-experience-modal"')
+
+        json_resp = self.client.get(reverse("main:get_experience_json"))
+        self.assertTrue(json_resp.json()[0]["can_update"])
+        self.assertFalse(json_resp.json()[0]["can_delete"])
 
     # 4. Superuser (Pemilik portofolio)
     def test_superuser_has_all_privileges(self):
@@ -388,13 +397,84 @@ class ExperienceAuthorizationAndRolesTest(TestCase):
         self.client.login(username="superuser", password="Password123!")
         response = self.client.get(reverse("main:show_experience"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, reverse("main:create_experience"))
-        self.assertContains(response, reverse("main:update_experience", args=[self.experience.id]))
+        self.assertContains(response, 'id="add-experience-modal"')
+        self.assertContains(response, reverse("main:create_experience_ajax"))
 
-    # 5. API Natural Foreign Keys
+        json_resp = self.client.get(reverse("main:get_experience_json"))
+        self.assertTrue(json_resp.json()[0]["can_update"])
+        self.assertTrue(json_resp.json()[0]["can_delete"])
+
+    # 5. API Natural Foreign Keys and JSON endpoints
     def test_api_experience_json_uses_natural_foreign_keys(self):
         self.experience.starred_by.add(self.regular_user)
         response = self.client.get(reverse("main:get_experience_json"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '["regular_user"]')
+
+    def test_create_experience_ajax_superuser(self):
+        self.client.login(username="superuser", password="Password123!")
+        response = self.client.post(
+            reverse("main:create_experience_ajax"),
+            {
+                "title": "New AJAX Experience",
+                "description": "Created with AJAX modal",
+                "category": "internship",
+            },
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(Experience.objects.filter(title="New AJAX Experience").exists())
+
+    def test_create_experience_ajax_regular_user_forbidden(self):
+        self.client.login(username="regular_user", password="Password123!")
+        response = self.client.post(
+            reverse("main:create_experience_ajax"),
+            {
+                "title": "Unauthorized Experience",
+                "description": "Should fail",
+                "category": "internship",
+            },
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_create_experience_ajax_editor_forbidden(self):
+        self.client.login(username="editor_user", password="Password123!")
+        response = self.client.post(
+            reverse("main:create_experience_ajax"),
+            {
+                "title": "Editor Experience",
+                "description": "Editor cannot create",
+                "category": "internship",
+            },
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_create_experience_ajax_xss_stripped(self):
+        self.client.login(username="superuser", password="Password123!")
+        response = self.client.post(
+            reverse("main:create_experience_ajax"),
+            {
+                "title": "<img src='x' onerror='alert(1)'>",
+                "description": "Dangerous input",
+                "category": "internship",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_experience_json_search_filter(self):
+        response = self.client.get(reverse("main:get_experience_json"), {"q": "Software"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 1)
+
+        response_empty = self.client.get(reverse("main:get_experience_json"), {"q": "NonExistentWord"})
+        self.assertEqual(response_empty.status_code, 200)
+        self.assertEqual(len(response_empty.json()), 0)
+
+    def test_get_experience_json_category_filter(self):
+        response = self.client.get(reverse("main:get_experience_json"), {"category": "internship"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 1)
+
+        response_diff = self.client.get(reverse("main:get_experience_json"), {"category": "full-time"})
+        self.assertEqual(response_diff.status_code, 200)
+        self.assertEqual(len(response_diff.json()), 0)
 
