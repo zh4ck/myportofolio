@@ -181,6 +181,24 @@ class ExperienceForm(ModelForm):
             ),
         }
 
+    def clean_title(self):
+        title = strip_tags(self.cleaned_data.get("title", "")).strip()
+        if not title:
+            raise ValidationError("Judul experience tidak boleh kosong atau hanya berisi tag HTML.")
+        return title
+
+    def clean_description(self):
+        description = strip_tags(self.cleaned_data.get("description", "")).strip()
+        if not description:
+            raise ValidationError("Deskripsi experience tidak boleh kosong atau hanya berisi tag HTML.")
+        return description
+
+    def clean_category(self):
+        val = self.cleaned_data.get("category")
+        if not val:
+            return "full-time"
+        return strip_tags(str(val)).strip()
+
     def clean_admin_key(self):
         key = self.cleaned_data.get("admin_key")
         expected_key = os.getenv("ADMIN_KEY")
