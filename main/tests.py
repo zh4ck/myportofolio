@@ -398,7 +398,7 @@ class ExperienceAuthorizationAndRolesTest(TestCase):
         response = self.client.get(reverse("main:show_experience"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'id="add-experience-modal"')
-        self.assertContains(response, reverse("main:create_experience_ajax"))
+        self.assertContains(response, reverse("api:experience-list"))
 
         json_resp = self.client.get(reverse("main:get_experience_json"))
         self.assertTrue(json_resp.json()[0]["can_update"])
