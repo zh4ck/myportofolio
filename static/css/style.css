@@ -899,11 +899,10 @@ ul { list-style: none; }
     position: relative;
     display: flex;
     gap: 0.36rem;
-    background: rgba(18, 18, 18, 0.72);
+    background: linear-gradient(135deg, rgba(28, 28, 28, 0.82), rgba(12, 12, 12, 0.76));
     border: 0.01rem solid rgba(255, 255, 255, 0.1);
     border-radius: 0.22rem;
-    padding: 0.32rem 0.4rem;
-    padding-right: 0.6rem;
+    padding: 0.34rem 0.4rem;
     overflow: hidden;
     transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
                 border-color 0.3s ease,
@@ -1004,14 +1003,16 @@ ul { list-style: none; }
     min-width: 0;
     display: flex;
     flex-direction: column;
+    justify-content: center;
 }
 
 .project-card__top {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    justify-content: space-between;
     flex-wrap: wrap;
     gap: 0.16rem;
-    margin-bottom: 0.06rem;
+    margin-bottom: 0.12rem;
 }
 
 .project-card__name {
@@ -1020,9 +1021,15 @@ ul { list-style: none; }
     line-height: 1.2;
     color: #fff;
     letter-spacing: 0.02em;
+    margin-bottom: 0.06rem;
+    overflow-wrap: anywhere;
 }
 
 .project-category {
+    display: inline-flex;
+    align-items: center;
+    min-height: 0.3rem;
+    max-width: 100%;
     font-family: var(--font-bit);
     color: #fff;
     font-size: 0.16rem;
@@ -1391,13 +1398,20 @@ footer {
 }
 
 .project-actions {
-    position: absolute;
-    top: 0.24rem;
-    right: 0.26rem;
-    z-index: 3;
+    position: relative;
+    z-index: 2;
     display: flex;
     align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
     gap: 0.1rem;
+    margin-left: auto;
+}
+
+.project-actions .button {
+    min-height: 0.3rem;
+    padding: 0.06rem 0.14rem;
+    white-space: nowrap;
 }
 
 .project-actions .project-delete-trigger {

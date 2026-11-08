@@ -118,14 +118,14 @@
             ? `<button type="button" class="button button-star${project.is_starred ? ' is-starred' : ''}" data-action="star" data-id="${escapeHtml(project.id)}" title="${escapeHtml(project.starred_by_names)}"><span aria-hidden="true">★</span> ${project.is_starred ? 'Unstar' : 'Star'} <span class="star-count">${project.star_count}</span></button>`
             : `<a href="{% url 'main:login' %}" class="button">Login to star (${project.star_count})</a>`;
         const remove = IS_SUPERUSER
-            ? `<button type="button" class="button button-danger button-sm" data-action="delete" data-id="${escapeHtml(project.id)}">Hapus</button>`
+            ? `<button type="button" class="button button-danger button-sm" data-action="delete" data-id="${escapeHtml(project.id)}" aria-label="Hapus ${escapeHtml(project.title)}">Hapus</button>`
             : '';
         article.innerHTML = `<span class="project-item__dot" aria-hidden="true"></span>
             <div class="project-card"><div class="project-card__glow" aria-hidden="true"></div>
-            <div class="project-actions">${star}${remove}</div>${image}
-            <div class="project-card__body"><div class="project-card__top">
+            ${image}<div class="project-card__body"><div class="project-card__top">
+            <span class="project-category experience-category">${escapeHtml(project.category_display)}</span>
+            <div class="project-actions">${star}${remove}</div></div>
             <h2 class="project-card__name">${escapeHtml(project.title)}</h2>
-            <span class="project-category experience-category">${escapeHtml(project.category_display)}</span></div>
             <p class="project-card__dates">${escapeHtml(project.date_display)}</p>
             <p class="project-card__description experience-description">${escapeHtml(project.description)}</p></div></div>`;
         return article;
