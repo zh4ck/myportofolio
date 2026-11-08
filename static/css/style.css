@@ -643,6 +643,12 @@ ul { list-style: none; }
     gap: 0.14rem;
     flex: 1;
     min-width: 3.2rem;
+    max-width: 60%;
+}
+
+.project-search #category-filter {
+    flex: 0 1 auto;
+    width: auto; 
 }
 
 .project-add-button {
