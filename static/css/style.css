@@ -1012,7 +1012,7 @@ ul { list-style: none; }
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 0.16rem;
-    margin-bottom: 0.12rem;
+    margin-bottom: 0.2rem;
 }
 
 .project-card__name {
@@ -1409,8 +1409,11 @@ footer {
 }
 
 .project-actions .button {
-    min-height: 0.3rem;
+    box-sizing: border-box;
+    height: 0.34rem;
     padding: 0.06rem 0.14rem;
+    border-radius: 0.08rem;
+    font-size: 0.15rem;
     white-space: nowrap;
 }
 
