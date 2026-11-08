@@ -59,7 +59,9 @@ class ProjectSerializer(StarFieldsMixin, serializers.ModelSerializer):
     def validate_title(self, value):
         value = strip_tags(value).strip()
         if not value:
-            raise serializers.ValidationError("Title cannot be empty.")
+            raise serializers.ValidationError(
+                "Judul experience tidak boleh kosong atau hanya berisi tag HTML."
+            )
         return value
 
     def validate_description(self, value):
@@ -113,7 +115,9 @@ class ExperienceSerializer(StarFieldsMixin, serializers.ModelSerializer):
     def validate_description(self, value):
         value = strip_tags(value).strip()
         if not value:
-            raise serializers.ValidationError("Description cannot be empty.")
+            raise serializers.ValidationError(
+                "Deskripsi experience tidak boleh kosong atau hanya berisi tag HTML."
+            )
         return value
 
     def get_date_display(self, obj):
