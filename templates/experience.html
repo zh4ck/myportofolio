@@ -32,7 +32,7 @@
                         <button type="submit" class="button">Cari</button>
                     </form>
                     {% if user.is_superuser %}
-                        <button type="button" class="button project-add-button" popovertarget="add-experience-modal">
+                        <button type="button" id="add-experience-button" class="button project-add-button" popovertarget="experience-form-modal">
                             <span aria-hidden="true">+</span> Tambah Experience
                         </button>
                     {% endif %}
@@ -50,7 +50,7 @@
         </section>
     </main>
 
-    {% if user.is_superuser %}
+    {% if user.is_superuser or is_editor %}
         {% include "components/experience_form_modal.html" %}
     {% endif %}
 
@@ -59,7 +59,6 @@
     const BASE_EXPERIENCE_ENDPOINT = "{% url 'api:experience-list' %}";
     const DETAIL_EXPERIENCE_ENDPOINT = "{% url 'api:experience-detail' '00000000-0000-0000-0000-000000000000' %}";
     const STAR_EXPERIENCE_ENDPOINT = "{% url 'api:experience-star' '00000000-0000-0000-0000-000000000000' %}";
-    const LEGACY_EDIT_ENDPOINT = "{% url 'main:update_experience' '00000000-0000-0000-0000-000000000000' %}";
     const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
     const IS_AUTHENTICATED = "{{ user.is_authenticated|yesno:'true,false' }}" === "true";
     const CAN_EDIT = "{{ is_editor|yesno:'true,false' }}" === "true" || IS_SUPERUSER;
@@ -71,8 +70,13 @@
     const searchInput = document.getElementById('search-input');
     const categoryFilter = document.getElementById('category-filter');
     const experienceForm = document.getElementById('experience-form');
+    const experienceModal = document.getElementById('experience-form-modal');
+    const experienceModalTitle = document.getElementById('experience-modal-title');
+    const experienceSubmitButton = document.getElementById('experience-submit-button');
+    const addExperienceButton = document.getElementById('add-experience-button');
     let experienceAbortController;
     let searchDebounceTimer;
+    let editedExperienceId = null;
 
     function getCookie(name) {
         const prefix = `${name}=`;
@@ -105,7 +109,7 @@
             ? `<button type="button" class="button button-star${experience.is_starred ? ' is-starred' : ''}" data-action="star" data-id="${escapeHtml(experience.id)}" title="${escapeHtml(experience.starred_by_names)}"><span aria-hidden="true">★</span> ${experience.is_starred ? 'Unstar' : 'Star'} <span class="star-count">${experience.star_count}</span></button>`
             : `<a href="{% url 'main:login' %}" class="button">Login to star (${experience.star_count})</a>`;
         const edit = CAN_EDIT
-            ? `<a href="${experienceEndpoint(LEGACY_EDIT_ENDPOINT, experience.id)}" class="project-delete-btn" aria-label="Ubah ${escapeHtml(experience.title)}" title="Ubah experience"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path><path d="m15 5 4 4"></path></svg></a>`
+            ? `<button type="button" class="project-delete-btn" data-action="edit" data-id="${escapeHtml(experience.id)}" aria-label="Ubah ${escapeHtml(experience.title)}" title="Ubah experience"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path><path d="m15 5 4 4"></path></svg></button>`
             : '';
         const remove = IS_SUPERUSER
             ? `<button type="button" class="project-delete-btn" data-action="delete" data-id="${escapeHtml(experience.id)}" aria-label="Hapus ${escapeHtml(experience.title)}" title="Hapus experience"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>`
@@ -145,7 +149,7 @@
     }
 
     function apiErrorMessage(data, status) {
-        const messages = Object.values(data).flat().filter(value => typeof value === 'string');
+        const messages = Object.values(data).flat(Infinity).filter(value => typeof value === 'string');
         return messages.join(' ') || `Request failed (HTTP ${status}).`;
     }
 
@@ -169,7 +173,43 @@
         return fetchExperiences(searchInput.value.trim(), categoryFilter.value);
     }
 
-    async function addExperience(event) {
+    function resetExperienceForm() {
+        if (!experienceForm) return;
+        editedExperienceId = null;
+        experienceForm.reset();
+        experienceModalTitle.textContent = 'Tambah Experience Baru';
+        experienceSubmitButton.textContent = 'Tambah Experience';
+    }
+
+    function datetimeLocalValue(value) {
+        if (!value) return '';
+        const date = new Date(value);
+        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+        return localDate.toISOString().slice(0, 16);
+    }
+
+    async function openEditExperience(id) {
+        try {
+            const response = await fetch(experienceEndpoint(DETAIL_EXPERIENCE_ENDPOINT, id), {
+                headers: { Accept: 'application/json' },
+            });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(apiErrorMessage(data, response.status));
+            editedExperienceId = id;
+            experienceForm.elements.title.value = data.title;
+            experienceForm.elements.description.value = data.description;
+            experienceForm.elements.category.value = data.category;
+            experienceForm.elements.thumbnail.value = data.thumbnail || '';
+            experienceForm.elements.ended_at.value = datetimeLocalValue(data.ended_at);
+            experienceModalTitle.textContent = 'Ubah Experience';
+            experienceSubmitButton.textContent = 'Simpan Perubahan';
+            experienceModal.showPopover();
+        } catch (error) {
+            showToast('Gagal membuka experience', error.message, 'error');
+        }
+    }
+
+    async function saveExperience(event) {
         event.preventDefault();
         const button = experienceForm.querySelector('button[type="submit"]');
         button.disabled = true;
@@ -182,23 +222,32 @@
                 thumbnail: fields.get('thumbnail') || null,
                 ended_at: fields.get('ended_at') || null,
             };
-            await writeExperience(BASE_EXPERIENCE_ENDPOINT, 'POST', payload);
-            experienceForm.reset();
-            document.getElementById('add-experience-modal').hidePopover();
-            showToast('Berhasil', 'Experience berhasil dibuat.', 'success');
+            const isEditing = Boolean(editedExperienceId);
+            const endpoint = isEditing
+                ? experienceEndpoint(DETAIL_EXPERIENCE_ENDPOINT, editedExperienceId)
+                : BASE_EXPERIENCE_ENDPOINT;
+            await writeExperience(endpoint, isEditing ? 'PATCH' : 'POST', payload);
+            experienceModal.hidePopover();
+            showToast('Berhasil', isEditing ? 'Experience berhasil diubah.' : 'Experience berhasil dibuat.', 'success');
+            resetExperienceForm();
             await refreshExperiences();
         } catch (error) {
-            showToast('Gagal membuat experience', error.message, 'error');
+            showToast('Gagal menyimpan experience', error.message, 'error');
         } finally {
             button.disabled = false;
         }
     }
 
-    if (experienceForm) experienceForm.addEventListener('submit', addExperience);
+    if (experienceForm) experienceForm.addEventListener('submit', saveExperience);
+    if (addExperienceButton) addExperienceButton.addEventListener('click', resetExperienceForm);
     gridContainer.addEventListener('click', async function(event) {
         const button = event.target.closest('button[data-action]');
         if (!button || button.disabled) return;
         const action = button.dataset.action;
+        if (action === 'edit') {
+            await openEditExperience(button.dataset.id);
+            return;
+        }
         if (action === 'delete' && !window.confirm('Hapus experience ini?')) return;
         button.disabled = true;
         try {

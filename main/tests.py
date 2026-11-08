@@ -267,8 +267,8 @@ class ExperienceAuthorizationAndRolesTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'id="experience-search-form"')
         self.assertNotContains(response, reverse("main:create_experience"))
-        self.assertNotContains(response, 'id="add-experience-modal"')
-        self.assertNotContains(response, 'popovertarget="add-experience-modal"')
+        self.assertNotContains(response, 'id="experience-form-modal"')
+        self.assertNotContains(response, 'popovertarget="experience-form-modal"')
 
         json_resp = self.client.get(reverse("main:get_experience_json"))
         self.assertEqual(json_resp.status_code, 200)
@@ -352,8 +352,9 @@ class ExperienceAuthorizationAndRolesTest(TestCase):
         self.client.login(username="editor_user", password="Password123!")
         response = self.client.get(reverse("main:show_experience"))
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'id="add-experience-modal"')
-        self.assertNotContains(response, 'popovertarget="add-experience-modal"')
+        self.assertContains(response, 'id="experience-form-modal"')
+        self.assertContains(response, "await writeExperience(endpoint, isEditing ? 'PATCH' : 'POST', payload)")
+        self.assertNotContains(response, 'id="add-experience-button"')
 
         json_resp = self.client.get(reverse("main:get_experience_json"))
         self.assertTrue(json_resp.json()[0]["can_update"])
@@ -397,7 +398,8 @@ class ExperienceAuthorizationAndRolesTest(TestCase):
         self.client.login(username="superuser", password="Password123!")
         response = self.client.get(reverse("main:show_experience"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'id="add-experience-modal"')
+        self.assertContains(response, 'id="experience-form-modal"')
+        self.assertContains(response, 'id="add-experience-button"')
         self.assertContains(response, reverse("api:experience-list"))
 
         json_resp = self.client.get(reverse("main:get_experience_json"))
