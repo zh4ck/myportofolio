@@ -1370,9 +1370,11 @@ footer {
 .meta-list {
     position: absolute;
     left: 2.89rem;
-    top: 6.64rem;
+    top: 8.76rem;
+    width: 8.75rem;
     display: flex;
-    gap: 0.24rem;
+    justify-content: space-between;
+    gap: 0.3rem;
     align-items: center;
     background: rgba(37, 37, 37, 0.2);
     border: 0.01rem solid rgba(255, 255, 255, 0.2);
