@@ -110,7 +110,7 @@
 
     function buildProjectCardElement(project) {
         const article = document.createElement('article');
-        article.className = 'project-item experience-card';
+        article.className = 'project-item';
         const image = project.project_image_url
             ? `<div class="project-card__photo"><img src="${escapeHtml(project.project_image_url)}" alt="Gambar ${escapeHtml(project.title)}" class="project-image"></div>`
             : `<div class="project-card__photo"><span class="project-card__photo-fallback" aria-hidden="true">${escapeHtml(project.title.slice(0, 1))}</span></div>`;

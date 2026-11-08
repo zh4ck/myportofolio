@@ -860,7 +860,7 @@ ul { list-style: none; }
     position: relative;
     z-index: 2;
     width: 100%;
-    max-width: 9.4rem;
+    max-width: 8.8rem;
     margin: 0 auto;
 }
 
@@ -882,7 +882,10 @@ ul { list-style: none; }
     background: linear-gradient(to bottom, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.04));
 }
 
-.project-item { position: relative; }
+.project-item {
+    position: relative;
+    width: 100%;
+}
 
 .project-item__dot {
     position: absolute;
@@ -902,7 +905,7 @@ ul { list-style: none; }
     background: linear-gradient(135deg, rgba(28, 28, 28, 0.82), rgba(12, 12, 12, 0.76));
     border: 0.01rem solid rgba(255, 255, 255, 0.1);
     border-radius: 0.22rem;
-    padding: 0.34rem 0.4rem;
+    padding: 0.3rem 0.34rem;
     overflow: hidden;
     transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
                 border-color 0.3s ease,
@@ -975,8 +978,8 @@ ul { list-style: none; }
 
 .project-card__photo {
     flex: none;
-    width: 1.6rem;
-    height: 1.6rem;
+    width: 1.45rem;
+    height: 1.45rem;
     border-radius: 0.16rem;
     overflow: hidden;
     background: rgba(255, 255, 255, 0.06);
