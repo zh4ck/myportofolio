@@ -633,6 +633,10 @@ ul { list-style: none; }
     flex-wrap: wrap;
 }
 
+.experience-toolbar {
+    max-width: 11.2rem;
+}
+
 .project-search {
     display: flex;
     align-items: stretch;
@@ -649,10 +653,12 @@ ul { list-style: none; }
     font-size: 0.18rem;
     border-radius: 0.12rem;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .project-search__input {
     flex: 1;
+    min-width: 0;
     background: rgba(255, 255, 255, 0.04);
     border: 0.01rem solid rgba(255, 255, 255, 0.12);
     border-radius: 0.12rem;
