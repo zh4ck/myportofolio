@@ -22,3 +22,10 @@ class IsPortfolioOwnerOrEditorOrReadOnly(BasePermission):
             "main.change_experience"
         )
         return request.method in ("PUT", "PATCH") and is_editor
+
+
+class IsEducationOwnerOrReadOnly(BasePermission):
+    message = "Only the portfolio owner can change education."
+
+    def has_permission(self, request, view):
+        return request.method in SAFE_METHODS or request.user.is_superuser

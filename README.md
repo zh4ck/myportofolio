@@ -79,6 +79,19 @@ python manage.py runserver
 
 Website sudah bisa diakses melalui http://127.0.0.1:8000 atau localhost anda. *Port mungkin berbeda tergantung ketersediaan port pada localhost anda*.
 
+## API untuk Flutter
+
+Jalankan migrasi setelah menginstal dependency untuk membuat tabel token dan education serta menambahkan `project_url` tanpa mengubah data proyek yang ada. Android emulator dapat mengakses server host melalui `http://10.0.2.2:8000`; jalankan server pada alamat yang dapat dijangkau emulator, misalnya `python manage.py runserver 0.0.0.0:8000`.
+
+- `POST /api/v1/auth/token/` menerima JSON `username` dan `password` dan mengembalikan `token`. Sertakan `Authorization: Token <token>` untuk request yang memerlukan autentikasi.
+- `POST /api/v1/auth/logout/` mencabut token yang digunakan untuk request dan mengembalikan 204. Jika dipanggil dengan session, token dan session tetap aktif; session Django dapat diakhiri melalui logout website. Request session yang mengubah data tetap memerlukan CSRF token.
+- `GET /api/v1/projects/` dan `GET /api/v1/projects/<uuid>/` bersifat publik; hanya superuser dapat membuat atau mengubah proyek. `project_url` opsional dan tersimpan terpisah dari `project_image_url`. Nilai `tech_stack` tetap mengikuti pilihan kategori proyek yang sudah ada.
+- `GET /api/v1/education/` dan `GET /api/v1/education/<uuid>/` bersifat publik; hanya superuser dapat membuat, mengubah, atau menghapus education. Data berisi `institution`, `major`, dan `started_at` dalam format `YYYY-MM-DD`.
+- Endpoint experience, pencarian, dan star tetap tersedia; autentikasi token maupun session didukung. Pengunjung tanpa autentikasi menerima 401 pada operasi yang memerlukan login, sedangkan pengguna yang tidak berwenang menerima 403.
+
+Pada pengembangan lokal CORS mengizinkan semua origin tanpa kredensial cookie lintas origin. Di produksi, set `PRODUCTION=True` dan `CORS_ALLOWED_ORIGINS` sebagai daftar origin terpisah koma, misalnya `https://app.example.com,https://admin.example.com`. Tanpa daftar tersebut tidak ada origin lintas situs yang diizinkan. CORS tidak menggantikan pengaturan `CSRF_TRUSTED_ORIGINS` untuk request berbasis session.
+
+
 ## Progres Mingguan
 
 | Week | Progres |

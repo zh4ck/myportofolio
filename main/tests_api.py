@@ -55,19 +55,20 @@ class ProjectAPITest(APITestCase):
     def test_guest_and_visitor_cannot_write(self):
         for user in (None, self.visitor):
             self.client.force_authenticate(user=user)
+            expected = status.HTTP_401_UNAUTHORIZED if user is None else status.HTTP_403_FORBIDDEN
             self.assertEqual(
                 self.client.post(self.list_url, self.payload, format="json").status_code,
-                status.HTTP_403_FORBIDDEN,
+                expected,
             )
             self.assertEqual(
                 self.client.patch(
                     self.detail_url, {"title": "Changed"}, format="json"
                 ).status_code,
-                status.HTTP_403_FORBIDDEN,
+                expected,
             )
             self.assertEqual(
                 self.client.delete(self.detail_url).status_code,
-                status.HTTP_403_FORBIDDEN,
+                expected,
             )
         self.assertEqual(Projects.objects.count(), 1)
         self.project.refresh_from_db()
@@ -114,7 +115,7 @@ class ProjectAPITest(APITestCase):
 
     def test_star_requires_login_and_toggles(self):
         self.assertEqual(
-            self.client.post(self.star_url).status_code, status.HTTP_403_FORBIDDEN
+            self.client.post(self.star_url).status_code, status.HTTP_401_UNAUTHORIZED
         )
         self.client.force_authenticate(user=self.visitor)
         response = self.client.post(self.star_url)
@@ -219,8 +220,9 @@ class ExperienceAPITest(APITestCase):
     def test_only_owner_can_create_and_delete(self):
         for user in (None, self.visitor, self.editor):
             self.client.force_authenticate(user=user)
-            self.assertEqual(self.client.post(self.list_url, self.payload, format="json").status_code, 403)
-            self.assertEqual(self.client.delete(self.detail_url).status_code, 403)
+            expected = status.HTTP_401_UNAUTHORIZED if user is None else status.HTTP_403_FORBIDDEN
+            self.assertEqual(self.client.post(self.list_url, self.payload, format="json").status_code, expected)
+            self.assertEqual(self.client.delete(self.detail_url).status_code, expected)
             self.assertEqual(Experience.objects.count(), 1)
             self.assertTrue(Experience.objects.filter(pk=self.experience.pk).exists())
         self.client.force_authenticate(user=self.owner)
@@ -266,7 +268,7 @@ class ExperienceAPITest(APITestCase):
         self.assertEqual(Experience.objects.count(), 2)
 
     def test_experience_star_requires_login_and_toggles(self):
-        self.assertEqual(self.client.post(self.star_url).status_code, 403)
+        self.assertEqual(self.client.post(self.star_url).status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertFalse(self.experience.starred_by.exists())
         self.client.force_authenticate(user=self.visitor)
         response = self.client.post(self.star_url)

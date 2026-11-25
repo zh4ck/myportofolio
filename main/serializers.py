@@ -1,7 +1,7 @@
 from django.utils.html import strip_tags
 from rest_framework import serializers
 
-from main.models import Experience, Projects
+from main.models import Education, Experience, Projects
 
 
 class StarFieldsMixin:
@@ -24,7 +24,6 @@ class ProjectSerializer(StarFieldsMixin, serializers.ModelSerializer):
     project_image_url = serializers.URLField(
         source="thumbnail", allow_blank=True, allow_null=True, required=False
     )
-    project_url = serializers.SerializerMethodField()
     category_display = serializers.CharField(source="get_category_display", read_only=True)
     date_display = serializers.SerializerMethodField()
     is_ongoing = serializers.BooleanField(read_only=True)
@@ -66,10 +65,6 @@ class ProjectSerializer(StarFieldsMixin, serializers.ModelSerializer):
 
     def validate_description(self, value):
         return strip_tags(value).strip()
-
-    def get_project_url(self, obj):
-        # The existing model has one URL field, used as its image URL.
-        return ""
 
     def get_date_display(self, obj):
         start = obj.date_start.strftime("%b %Y") if obj.date_start else ""
@@ -127,3 +122,10 @@ class ExperienceSerializer(StarFieldsMixin, serializers.ModelSerializer):
 
     def get_status_display(self, obj):
         return "Ongoing" if obj.is_ongoing else "Finished"
+
+
+class EducationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Education
+        fields = ["id", "institution", "major", "started_at"]
+        read_only_fields = ["id"]

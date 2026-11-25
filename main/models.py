@@ -45,6 +45,7 @@ class Projects(models.Model):
     description = models.TextField(default='')
     category = models.CharField(max_length=20, choices=PROJECT_TYPES, default='other')
     thumbnail = models.URLField(blank=True, null=True)
+    project_url = models.URLField(blank=True, default='')
     date_start = models.DateTimeField(db_default=Now())
     date_end = models.DateTimeField(blank=True, null=True)
     starred_by = models.ManyToManyField(
@@ -57,3 +58,13 @@ class Projects(models.Model):
     @property
     def is_ongoing(self):
         return self.date_end is None
+
+
+class Education(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    institution = models.CharField(max_length=255)
+    major = models.CharField(max_length=255)
+    started_at = models.DateField()
+
+    def __str__(self):
+        return self.institution
